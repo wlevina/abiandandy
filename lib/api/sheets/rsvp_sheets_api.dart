@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:wedding_website/model/guests.dart';
 
@@ -34,14 +35,18 @@ class RsvpSheetsApi {
     Map<String, dynamic> body,
   ) async {
     try {
+      // text/plain avoids a CORS preflight (OPTIONS), which Apps Script
+      // Web Apps don't implement — the JSON body is unaffected since
+      // Code.gs parses e.postData.contents regardless of content type.
       final response = await http.post(
         Uri.parse(_endpoint),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'text/plain;charset=utf-8'},
         body: jsonEncode({...body, 'token': _token}),
       );
       if (response.statusCode != 200) return null;
       return jsonDecode(response.body) as Map<String, dynamic>;
     } catch (e) {
+      debugPrint('RsvpSheetsApi error: $e');
       return null;
     }
   }
