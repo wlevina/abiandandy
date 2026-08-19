@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'api/sheets/rsvp_sheets_api.dart';
 import 'home.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await RsvpSheetsApi.init();
+void main() {
   runApp(const MyApp());
 }
 

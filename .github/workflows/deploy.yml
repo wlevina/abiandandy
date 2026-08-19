@@ -26,7 +26,10 @@ jobs:
 
       - run: flutter pub get
 
-      - run: flutter build web --release --base-href /abiandandy/
+      - run: |
+          flutter build web --release --base-href /abiandandy/ \
+            --dart-define=RSVP_API_URL=${{ secrets.RSVP_API_URL }} \
+            --dart-define=RSVP_API_TOKEN=${{ secrets.RSVP_API_TOKEN }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
