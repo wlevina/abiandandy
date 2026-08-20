@@ -19,14 +19,18 @@ class RsvpSheetsApi {
     return (Guest.fromJson(guestJson), party);
   }
 
-  static Future<bool> update(
-    String name,
-    Map<String, dynamic> guestDetails,
+  // Submits every party member's update in one request, so the Apps Script
+  // backend only spins up (and reads/writes the sheet) once per RSVP
+  // submission instead of once per party member.
+  static Future<bool> updateParty(
+    Map<String, Map<String, dynamic>> guestDetailsByName,
   ) async {
     final response = await _post({
       'action': 'update',
-      'name': name,
-      'details': guestDetails,
+      'updates': [
+        for (final entry in guestDetailsByName.entries)
+          {'name': entry.key, 'details': entry.value},
+      ],
     });
     return response?['success'] == true;
   }

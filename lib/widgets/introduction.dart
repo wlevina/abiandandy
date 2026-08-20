@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wedding_website/screens/rsvp_form.dart';
+import 'package:wedding_website/widgets/app_drawer.dart';
+import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class Introduction extends StatelessWidget {
   const Introduction({super.key});
@@ -38,13 +40,7 @@ class Introduction extends StatelessWidget {
 
   // Small hand-drawn-style squiggle used under the date/location text.
   Widget _squiggle({double width = 90}) {
-    return SizedBox(
-      width: width,
-      height: 14,
-      child: CustomPaint(
-        painter: _SquigglePainter(color: creamColor),
-      ),
-    );
+    return SquiggleDivider(width: width, height: 14, color: creamColor);
   }
 
   Widget _title(BuildContext context) {
@@ -175,8 +171,7 @@ class Introduction extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const RsvpForm()));
+        Navigator.push(context, fadeSlideRoute(const RsvpForm()));
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: creamColor,
@@ -243,10 +238,9 @@ class Introduction extends StatelessWidget {
           child: _invitation(context),
         ),
         SizedBox(height: 180 * _spacingScale(context)),
-        Divider(
+        SquiggleDivider(
+          width: screenWidth - dividerSize * 2,
           color: creamColor,
-          indent: dividerSize,
-          endIndent: dividerSize,
         ),
       ],
     );
@@ -265,34 +259,4 @@ class Introduction extends StatelessWidget {
       child: mobile ? Center(child: content) : content,
     );
   }
-}
-
-// Simple squiggly line painter to mimic the hand-drawn underline accents.
-class _SquigglePainter extends CustomPainter {
-  final Color color;
-
-  _SquigglePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.2
-      ..style = PaintingStyle.stroke;
-
-    final path = Path();
-    path.moveTo(0, size.height * 0.6);
-    path.quadraticBezierTo(
-        size.width * 0.15, 0, size.width * 0.3, size.height * 0.5);
-    path.quadraticBezierTo(
-        size.width * 0.45, size.height, size.width * 0.6, size.height * 0.4);
-    path.quadraticBezierTo(
-        size.width * 0.75, 0, size.width, size.height * 0.5);
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SquigglePainter oldDelegate) =>
-      oldDelegate.color != color;
 }

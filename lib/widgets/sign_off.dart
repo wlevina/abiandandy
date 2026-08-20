@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class SignOff extends StatelessWidget {
   const SignOff({super.key});
@@ -14,8 +15,8 @@ class SignOff extends StatelessWidget {
   Widget _signOff(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    double titleTextSize = screenWidth > 975 ? 60.0 : 48.0;
-    double detailsTextSize = screenWidth > 975 ? 30.0 : 21.0;
+    double titleTextSize = screenWidth > 975 ? 60.0 : 38.0;
+    double detailsTextSize = screenWidth > 975 ? 30.0 : 18.0;
     double dividerSize = screenWidth > 975 ? screenWidth * 0.4 : screenWidth * 0.25;
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -23,11 +24,13 @@ class SignOff extends StatelessWidget {
         textAlign: TextAlign.center,
         TextSpan(text: 'A & A', style: TextStyle(fontFamily: 'Madelyn', fontSize: titleTextSize, color: creamColor)),
       ),
-      Divider(
+      const SizedBox(height: 0),
+      SquiggleDivider(
+        width: screenWidth - dividerSize * 2,
+        height: 10,
         color: creamColor,
-        indent: dividerSize,
-        endIndent: dividerSize,
       ),
+      const SizedBox(height: 16),
       Text.rich(
         textAlign: TextAlign.left,
         TextSpan(children: [

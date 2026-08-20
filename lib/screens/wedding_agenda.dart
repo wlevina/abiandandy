@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
 class WeddingAgenda extends StatelessWidget {
@@ -36,7 +37,7 @@ class WeddingAgenda extends StatelessWidget {
   Widget _weddingDayTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 45.0 : 36.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(
           text: 'Ceremony',
@@ -57,7 +58,7 @@ class WeddingAgenda extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-      Text.rich(
+      SelectableText.rich(
         textAlign: TextAlign.left,
         TextSpan(children: [
           // TextSpan(
@@ -107,7 +108,7 @@ class WeddingAgenda extends StatelessWidget {
   Widget _recoveryTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 45.0 : 36.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(
           text: 'Reception',
@@ -128,7 +129,7 @@ class WeddingAgenda extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-      Text.rich(
+      SelectableText.rich(
         textAlign: TextAlign.left,
         TextSpan(children: [
           //TextSpan(
@@ -198,6 +199,7 @@ class WeddingAgenda extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 25),
               )),
+          drawer: const AppDrawer(selectedIndex: 2),
           body: SingleChildScrollView(
               child: Center(
                   child: Container(
@@ -242,6 +244,7 @@ class WeddingAgenda extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 25),
             )),
+        drawer: const AppDrawer(selectedIndex: 2),
         body: SingleChildScrollView(
           child: Center(
             child: DefaultTextStyle(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class Ceremony extends StatelessWidget {
   const Ceremony({super.key});
@@ -7,7 +8,6 @@ class Ceremony extends StatelessWidget {
   static const Color backgroundColor = Color(0xFF687351);
   static const Color creamColor = Color(0xFFF3F0E7);
 
-  // TODO: replace with the real Google Maps link for the venue.
   static const String googleMapsUrl =
       'https://maps.app.goo.gl/aSrjmY8d2umRF9Az6';
 
@@ -26,9 +26,7 @@ class Ceremony extends StatelessWidget {
 
   Future<void> _launchMaps() async {
     final uri = Uri.parse(googleMapsUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Widget _ceremony(BuildContext context) {
@@ -57,7 +55,7 @@ class Ceremony extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 25),
-        Text(
+        SelectableText(
           'Please arrive by 12:15pm for a 12:30pm start',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -68,7 +66,7 @@ class Ceremony extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 25),
-        Text(
+        SelectableText(
           'The Mint',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -79,7 +77,7 @@ class Ceremony extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(
+        SelectableText(
           '10 Macquarie Street, Sydney NSW',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -89,16 +87,19 @@ class Ceremony extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        GestureDetector(
-          onTap: _launchMaps,
-          child: Text(
-            'View on Google maps',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'CoreBandiFace',
-              fontSize: linkTextSize,
-              color: creamColor,
-              decoration: TextDecoration.underline,
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: _launchMaps,
+            child: Text(
+              'View on Google maps',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'CoreBandiFace',
+                fontSize: linkTextSize,
+                color: creamColor,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
         ),
@@ -132,10 +133,9 @@ class Ceremony extends StatelessWidget {
                   width: screenWidth * 0.8,
                   child: _ceremony(context)),
               SizedBox(height: 180 * _spacingScale(context)),
-              Divider(
+              SquiggleDivider(
+                width: screenWidth - dividerSize * 2,
                 color: creamColor,
-                indent: dividerSize,
-                endIndent: dividerSize,
               ),
             ],
           ),
@@ -172,10 +172,9 @@ class Ceremony extends StatelessWidget {
               ),
             ),
           ),
-          Divider(
+          SquiggleDivider(
+            width: screenWidth - dividerSize * 2,
             color: creamColor,
-            indent: dividerSize,
-            endIndent: dividerSize,
           ),
         ])),
       );

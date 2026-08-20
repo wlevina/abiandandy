@@ -41,7 +41,7 @@ class OverseasGuests extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(
+            child: SelectableText(
               text,
               style: TextStyle(
                 fontFamily: 'CoreBandiFace',
@@ -59,7 +59,7 @@ class OverseasGuests extends StatelessWidget {
   Widget _paragraph(String text, double fontSize, {TextAlign? align}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Text(
+      child: SelectableText(
         text,
         textAlign: align ?? TextAlign.left,
         style: TextStyle(

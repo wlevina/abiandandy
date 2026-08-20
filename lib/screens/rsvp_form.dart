@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
+import 'package:wedding_website/home.dart';
 import 'package:wedding_website/model/guests.dart';
+import 'package:wedding_website/widgets/app_drawer.dart';
 
 class _PartyMember {
   final String name;
@@ -32,7 +34,7 @@ class RsvpFormState extends State<RsvpForm> {
   static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
   static const Color creamColor = Color(0xFFF3F0E7);
   static const Color errorColor = Color(0xFFF4C868);
-  static const List<String> attendanceOptions = ['', 'Yes', 'No'];
+  static const List<String> attendanceOptions = ['Yes', 'No'];
 
   final formKey = GlobalKey<FormState>();
   final nameFieldKey = GlobalKey<FormFieldState<String>>();
@@ -47,6 +49,14 @@ class RsvpFormState extends State<RsvpForm> {
   String? _resolvedForName;
 
   int _validationRequestId = 0;
+
+  // Guards against a second Confirm tap firing while one is already in
+  // flight — without this, an impatient double-tap starts a second lookup
+  // that races the first: the first call's own (now-stale) response still
+  // resumes its _handleSubmit, sees the not-yet-updated primaryGuest as
+  // null, and flashes the "can't find your invite" error just before the
+  // second call's real result corrects it.
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -370,17 +380,24 @@ class RsvpFormState extends State<RsvpForm> {
   Widget _partyCeremony(
       BuildContext context, _PartyMember member, bool isSelf) {
     final value =
-        attendanceOptions.contains(member.ceremony) ? member.ceremony : '';
+        attendanceOptions.contains(member.ceremony) ? member.ceremony : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Will ${member.name} be attending our wedding ceremony?",
             style: TextStyle(fontSize: fieldTextSize(context))),
+        // Gives the popup menu room to open upward (it aligns the
+        // selected item with the field) without overlapping the
+        // question text above it.
+        const SizedBox(height: 10),
         DropdownButtonFormField<String>(
           key: ValueKey('${member.name}-ceremony'),
           initialValue: value,
-          onChanged: (value) => setState(() => member.ceremony = value!),
+          // Form.reset() (Cancel) restores dropdowns to their initial
+          // value by invoking this callback with null — a bare `!` would
+          // throw and abort the whole reset before it clears `_party`.
+          onChanged: (value) => setState(() => member.ceremony = value ?? ''),
           items: attendanceOptions
               .map((value) => DropdownMenuItem(
                     value: value,
@@ -400,12 +417,13 @@ class RsvpFormState extends State<RsvpForm> {
                   ))
               .toList(),
           decoration: _underlineDecoration(
-              filled: value.isNotEmpty,
+              filled: value != null,
               fillColor: backgroundColor),
           icon: Icon(Icons.keyboard_arrow_down_rounded,
               color: creamColor.withValues(alpha: 0.8)),
           iconSize: 30,
-          validator: (value) => isSelf && value != null && value.isEmpty
+          validator: (value) =>
+              isSelf && value == null
               ? "Please select a response."
               : null,
         ),
@@ -416,17 +434,21 @@ class RsvpFormState extends State<RsvpForm> {
   Widget _partyReception(
       BuildContext context, _PartyMember member, bool isSelf) {
     final value =
-        attendanceOptions.contains(member.reception) ? member.reception : '';
+        attendanceOptions.contains(member.reception) ? member.reception : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Will ${member.name} be attending our wedding reception?",
             style: TextStyle(fontSize: fieldTextSize(context))),
+        // Gives the popup menu room to open upward (it aligns the
+        // selected item with the field) without overlapping the
+        // question text above it.
+        const SizedBox(height: 10),
         DropdownButtonFormField<String>(
           key: ValueKey('${member.name}-reception'),
           initialValue: value,
-          onChanged: (value) => setState(() => member.reception = value!),
+          onChanged: (value) => setState(() => member.reception = value ?? ''),
           items: attendanceOptions
               .map((value) => DropdownMenuItem(
                     value: value,
@@ -446,12 +468,13 @@ class RsvpFormState extends State<RsvpForm> {
                   ))
               .toList(),
           decoration: _underlineDecoration(
-              filled: value.isNotEmpty,
+              filled: value != null,
               fillColor: backgroundColor),
           icon: Icon(Icons.keyboard_arrow_down_rounded,
               color: creamColor.withValues(alpha: 0.8)),
           iconSize: 30,
-          validator: (value) => isSelf && value != null && value.isEmpty
+          validator: (value) =>
+              isSelf && value == null
               ? "Please select a response."
               : null,
         ),
@@ -477,152 +500,233 @@ class RsvpFormState extends State<RsvpForm> {
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
-    final typedName = controllerName.text.trim().toLowerCase();
-    final isFirstReveal = _resolvedForName != typedName;
+    // Ignore a second trigger (double-tap, or Confirm tapped right after
+    // the keyboard's Done/onFieldSubmitted already fired) while the first
+    // is still in flight — otherwise the two calls race and the first
+    // one's now-stale "not found" fallback can flash before the second's
+    // real result corrects it.
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
 
-    if (isFirstReveal) {
-      // Only re-fetch from the sheet on the reveal step. Fetching again
-      // on the follow-up submit click would rebuild `_party` from the
-      // server's (still blank) data and wipe out whatever the user just
-      // typed into the fields before validation even runs.
-      await validateName();
-      if (!mounted) return;
+    try {
+      final typedName = controllerName.text.trim().toLowerCase();
+      final isFirstReveal = _resolvedForName != typedName;
 
-      // Resolving the name can reveal new party-member fields. Wait for
-      // that rebuild to actually happen before validating/returning,
-      // otherwise those fields aren't registered with the Form yet and
-      // validate() silently skips them.
-      await WidgetsBinding.instance.endOfFrame;
-      if (!mounted) return;
+      if (isFirstReveal) {
+        // Only re-fetch from the sheet on the reveal step. Fetching again
+        // on the follow-up submit click would rebuild `_party` from the
+        // server's (still blank) data and wipe out whatever the user just
+        // typed into the fields before validation even runs.
+        await validateName();
+        if (!mounted) return;
 
-      if (primaryGuest != null) {
-        // Found the invite — show it for review instead of immediately
-        // flagging required fields nobody's had a chance to answer yet.
-        // A second Confirm (below) actually submits.
-        _resolvedForName = typedName;
-        // Clear a stale "can't find invite" error left over from an
-        // earlier failed attempt, without validating the newly-revealed
-        // (and not yet answered) party fields.
-        nameFieldKey.currentState?.validate();
-        return;
+        // Resolving the name can reveal new party-member fields. Wait for
+        // that rebuild to actually happen before validating/returning,
+        // otherwise those fields aren't registered with the Form yet and
+        // validate() silently skips them.
+        await WidgetsBinding.instance.endOfFrame;
+        if (!mounted) return;
+
+        if (primaryGuest != null) {
+          // Found the invite — show it for review instead of immediately
+          // flagging required fields nobody's had a chance to answer yet.
+          // A second Confirm (below) actually submits.
+          _resolvedForName = typedName;
+          // Clear a stale "can't find invite" error left over from an
+          // earlier failed attempt, without validating the newly-revealed
+          // (and not yet answered) party fields.
+          nameFieldKey.currentState?.validate();
+          return;
+        }
+        // Not found — fall through so the "can't find invite" error shows.
       }
-      // Not found — fall through so the "can't find invite" error shows.
-    }
 
-    final form = formKey.currentState!;
-    final isValid = form.validate();
+      final form = formKey.currentState!;
+      final isValid = form.validate();
 
-    if (!isValid) return;
+      if (!isValid) return;
 
-    final submittedParty = List<_PartyMember>.from(_party);
+      final submittedParty = List<_PartyMember>.from(_party);
 
-    // Fire the updates first so the confirmation only shows once the
-    // writes have actually happened; still guarded by `mounted` below
-    // since the user could navigate away while this is in flight.
-    await Future.wait([
-      for (final member in submittedParty)
-        RsvpSheetsApi.update(
-          member.name,
-          Guest(
+      // Fire the update first so the confirmation only shows once the
+      // write has actually happened; still guarded by `mounted` below
+      // since the user could navigate away while this is in flight.
+      await RsvpSheetsApi.updateParty({
+        for (final member in submittedParty)
+          member.name: Guest(
             name: member.name,
             ceremony: member.ceremony,
             reception: member.reception,
             dietary: member.dietaryController.text,
           ).toJson(),
-        ),
-    ]);
+      });
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    final partySize = submittedParty.length;
+      final partySize = submittedParty.length;
 
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            color: creamColor,
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const SizedBox(height: 20),
-                Text.rich(
-                  textAlign: TextAlign.center,
-                  TextSpan(children: [
-                    TextSpan(
-                        text: 'Thank you for your RSVP!\n',
+      showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              color: creamColor,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const SizedBox(height: 20),
+                  Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(children: [
+                      TextSpan(
+                          text: 'Thank you for your RSVP!\n',
+                          style: TextStyle(
+                              fontSize: fieldTextSize(context),
+                              color: backgroundColor)),
+                      TextSpan(
+                          text: partySize > 1
+                              ? '\nWe\'ve recorded responses for your whole party. If you need to update any of your responses, please submit a new RSVP.'
+                              : '\nIf you need to update any of your responses, please submit a new RSVP.',
+                          style: TextStyle(
+                              fontSize: fieldTextSize(context),
+                              color: backgroundColor)),
+                    ]),
+                  ),
+                  const SizedBox(height: 50),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        backgroundColor: creamColor,
+                        side: BorderSide(
+                            color: backgroundColor.withValues(alpha: 0.8))),
+                    onPressed: () {
+                      Navigator.pop(context); // Close the bottom sheet
+                      Navigator.pop(context);
+                      if (!mounted) return;
+                      setState(() {
+                        formKey.currentState!.reset();
+                        controllerName.clear();
+                        primaryGuest = null;
+                        _resolvedForName = null;
+                        _setParty([]);
+                      });
+                    },
+                    child: Text("Close",
                         style: TextStyle(
-                            fontSize: fieldTextSize(context),
+                            fontSize: buttonTextSize(context),
+                            fontWeight: FontWeight.normal,
                             color: backgroundColor)),
-                    TextSpan(
-                        text: partySize > 1
-                            ? '\nWe\'ve recorded responses for your whole party. If you need to update any of your responses, please submit a new RSVP.'
-                            : '\nIf you need to update any of your responses, please submit a new RSVP.',
-                        style: TextStyle(
-                            fontSize: fieldTextSize(context),
-                            color: backgroundColor)),
-                  ]),
-                ),
-                const SizedBox(height: 50),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                      backgroundColor: creamColor,
-                      side: BorderSide(color: backgroundColor.withValues(alpha: 0.8))),
-                  onPressed: () {
-                    Navigator.pop(context); // Close the bottom sheet
-                    Navigator.pop(context);
-                    if (!mounted) return;
-                    setState(() {
-                      formKey.currentState!.reset();
-                      controllerName.clear();
-                      primaryGuest = null;
-                      _resolvedForName = null;
-                      _setParty([]);
-                    });
-                  },
-                  child: Text("Close",
-                      style: TextStyle(
-                          fontSize: buttonTextSize(context),
-                          fontWeight: FontWeight.normal,
-                          color: backgroundColor)),
-                ),
-              ],
-            ),
-          );
-        });
+                  ),
+                ],
+              ),
+            );
+          });
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   Widget _submit(BuildContext context) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
           side: BorderSide(color: creamColor.withValues(alpha: 0.8))),
-      onPressed: () => _handleSubmit(context),
-      child: Text("Confirm",
-          style: TextStyle(
-              fontSize: buttonTextSize(context),
-              fontWeight: FontWeight.normal,
-              color: creamColor)),
+      onPressed: _isSubmitting ? null : () => _handleSubmit(context),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Keeps "Confirm" laid out (just invisible) while loading, so the
+          // button reserves the same footprint instead of shrinking to fit
+          // the smaller spinner.
+          Visibility(
+            visible: !_isSubmitting,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: Text("Confirm",
+                style: TextStyle(
+                    fontSize: buttonTextSize(context),
+                    fontWeight: FontWeight.normal,
+                    color: creamColor)),
+          ),
+          if (_isSubmitting)
+            SizedBox(
+              width: buttonTextSize(context) * 0.7,
+              height: buttonTextSize(context) * 0.7,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                strokeCap: StrokeCap.round,
+                color: creamColor.withValues(alpha: 0.8),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
   Widget _cancel(BuildContext context) {
+    // Before the name has been resolved (just the name field showing),
+    // Cancel exits the RSVP flow entirely and returns Home. Once the party
+    // fields are showing, Cancel instead resets back to the name field
+    // rather than leaving the RSVP screen.
+    final goToHome = _party.isEmpty;
+
     return OutlinedButton(
         style: OutlinedButton.styleFrom(
             side: BorderSide(color: creamColor.withValues(alpha: 0.8))),
-        onPressed: () {
-          setState(() {
-            formKey.currentState!.reset();
-            controllerName.clear();
-            primaryGuest = null;
-            _resolvedForName = null;
-            _setParty([]);
-          });
-        },
+        onPressed: _isSubmitting
+            ? null
+            : () {
+                if (goToHome) {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                  homeKey.currentState?.scrollToTop();
+                  return;
+                }
+                setState(() {
+                  formKey.currentState!.reset();
+                  controllerName.clear();
+                  primaryGuest = null;
+                  _resolvedForName = null;
+                  _setParty([]);
+                });
+              },
         child: Text("Cancel",
             style: TextStyle(
                 fontSize: buttonTextSize(context),
                 fontWeight: FontWeight.normal,
                 color: creamColor)));
+  }
+
+  // Cross-fades + grows between the bare name field and the resolved
+  // party list, instead of the two swapping instantly the moment
+  // validateName() resolves — that abrupt layout jump is what reads as
+  // "sudden" when the Confirm spinner finishes.
+  Widget _formContent(BuildContext context, {required double nameSpacing}) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: SizeTransition(
+          sizeFactor: animation,
+          alignment: Alignment.topCenter,
+          child: child,
+        ),
+      ),
+      child: _party.isEmpty
+          ? Column(
+              key: const ValueKey('name'),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _name(context),
+                SizedBox(height: nameSpacing),
+              ],
+            )
+          : Column(
+              key: const ValueKey('party'),
+              mainAxisSize: MainAxisSize.min,
+              children: [_partyList(context)],
+            ),
+    );
   }
 
   Widget _buttonRow(BuildContext context) {
@@ -661,6 +765,7 @@ class RsvpFormState extends State<RsvpForm> {
                     fontWeight: FontWeight.bold,
                     fontSize: 25),
               )),
+          drawer: const AppDrawer(selectedIndex: 1),
           body: SingleChildScrollView(
               child: Center(
                   child: Form(
@@ -678,11 +783,7 @@ class RsvpFormState extends State<RsvpForm> {
                     SizedBox(height: screenHeight * 0.1),
                     _title(context),
                     const SizedBox(height: 20),
-                    if (_party.isEmpty) ...[
-                      _name(context),
-                      const SizedBox(height: 32),
-                    ],
-                    _partyList(context),
+                    _formContent(context, nameSpacing: 32),
                     const SizedBox(height: 48),
                     _buttonRow(context)
                   ],
@@ -707,13 +808,13 @@ class RsvpFormState extends State<RsvpForm> {
                     fontWeight: FontWeight.bold,
                     fontSize: 25),
               )),
+          drawer: const AppDrawer(selectedIndex: 1),
           body: SingleChildScrollView(
               child: Center(
                   child: Form(
             key: formKey,
             child: ConstrainedBox(
-              constraints:
-                  BoxConstraints(minHeight: screenHeight, maxWidth: 600),
+              constraints: const BoxConstraints(maxWidth: 600),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(30.0),
@@ -723,13 +824,10 @@ class RsvpFormState extends State<RsvpForm> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      SizedBox(height: screenHeight * 0.1),
                       _title(context),
                       const SizedBox(height: 20),
-                      if (_party.isEmpty) ...[
-                        _name(context),
-                        const SizedBox(height: 20),
-                      ],
-                      _partyList(context),
+                      _formContent(context, nameSpacing: 20),
                       const SizedBox(height: 48),
                       _buttonRow(context)
                     ],

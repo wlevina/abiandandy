@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/overseas_guests.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
@@ -29,6 +30,7 @@ class OverseasGuestsScreen extends StatelessWidget {
           ),
         ),
       ),
+      drawer: const AppDrawer(selectedIndex: 3),
       body: const SingleChildScrollView(
         child: Column(
           children: [

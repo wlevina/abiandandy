@@ -35,7 +35,7 @@ function doPost(e) {
     case 'lookup':
       return jsonResponse(lookupGuest(headers, data, body.name));
     case 'update':
-      return jsonResponse(updateGuest(sheet, headers, data, body.name, body.details));
+      return jsonResponse(updateGuests(sheet, headers, data, body.updates));
     default:
       return jsonResponse({ error: 'unknown action' });
   }
@@ -70,22 +70,32 @@ function lookupGuest(headers, data, name) {
   return { guest: primary, party: party };
 }
 
-function updateGuest(sheet, headers, data, name, details) {
+// Applies every party member's update within this single script execution,
+// writing each changed row back in one setValues() call (instead of one
+// call per field) so a party-of-N submission costs N writes, not 3N.
+function updateGuests(sheet, headers, data, updates) {
   const nameIdx = headers.indexOf(FIELDS.name);
-  const normalized = String(name || '').trim().toLowerCase();
+  const results = {};
 
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][nameIdx] || '').trim().toLowerCase() === normalized) {
-      Object.keys(details || {}).forEach((key) => {
-        const colIdx = headers.indexOf(key);
-        if (colIdx !== -1) {
-          sheet.getRange(i + 1, colIdx + 1).setValue(details[key]);
-        }
-      });
-      return { success: true };
+  (updates || []).forEach((u) => {
+    const normalized = String(u.name || '').trim().toLowerCase();
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][nameIdx] || '').trim().toLowerCase() === normalized) {
+        Object.keys(u.details || {}).forEach((key) => {
+          const colIdx = headers.indexOf(key);
+          if (colIdx !== -1) data[i][colIdx] = u.details[key];
+        });
+        sheet.getRange(i + 1, 1, 1, headers.length).setValues([data[i]]);
+        results[u.name] = true;
+        return;
+      }
     }
-  }
-  return { success: false };
+    results[u.name] = false;
+  });
+
+  const success =
+    Object.keys(results).length > 0 && Object.values(results).every(Boolean);
+  return { success: success, results: results };
 }
 
 function rowToObject(headers, row) {

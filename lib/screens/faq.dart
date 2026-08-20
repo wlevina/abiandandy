@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
 class Faq extends StatelessWidget {
@@ -32,7 +33,7 @@ class Faq extends StatelessWidget {
   Widget _rsvpDeadlineTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'When is the RSVP deadline?',
@@ -48,7 +49,7 @@ class Faq extends StatelessWidget {
     //double titleTextSize = screenWidth(context) > 975 ? 28.0 : 24.0;
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -63,7 +64,7 @@ class Faq extends StatelessWidget {
   Widget _whereTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'Where will the ceremony be?',
@@ -78,7 +79,7 @@ class Faq extends StatelessWidget {
   Widget _where(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -94,7 +95,7 @@ class Faq extends StatelessWidget {
   Widget _whereReceptionTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'Where will the reception be?',
@@ -109,7 +110,7 @@ class Faq extends StatelessWidget {
   Widget _whereReception(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -124,7 +125,7 @@ class Faq extends StatelessWidget {
   Widget _howGetThereTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'How do I get to the venues?',
@@ -139,7 +140,7 @@ class Faq extends StatelessWidget {
   Widget _howGetThere(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -155,7 +156,7 @@ class Faq extends StatelessWidget {
   Widget _dressCodeTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'What\'s the dress code?',
@@ -171,7 +172,7 @@ class Faq extends StatelessWidget {
     //double titleTextSize = screenWidth(context) > 975 ? 28.0 : 24.0;
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -187,7 +188,7 @@ class Faq extends StatelessWidget {
   Widget _plusOneTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'Can I bring a guest?',
@@ -202,7 +203,7 @@ class Faq extends StatelessWidget {
   Widget _plusOne(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -217,7 +218,7 @@ class Faq extends StatelessWidget {
     Widget _kidsTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'Are kids welcome at the wedding?',
@@ -232,7 +233,7 @@ class Faq extends StatelessWidget {
   Widget _kids(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -248,7 +249,7 @@ class Faq extends StatelessWidget {
   Widget _presentTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'Should I bring a present?',
@@ -263,7 +264,7 @@ class Faq extends StatelessWidget {
   Widget _present(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -280,7 +281,7 @@ class Faq extends StatelessWidget {
   Widget _moreQuestionsTitle(BuildContext context) {
     double titleTextSize = screenWidth(context) > 975 ? 27.0 : 24.0;
 
-    return Text.rich(
+    return SelectableText.rich(
           textAlign: isMobileWidth(context) ? TextAlign.center : TextAlign.left,
           TextSpan(
               text: 'What if I have more questions?',
@@ -295,7 +296,7 @@ class Faq extends StatelessWidget {
   Widget _moreQuestions(BuildContext context) {
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
-    return Text.rich(
+    return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(children: [
         TextSpan(
@@ -338,6 +339,7 @@ class Faq extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 25),
               )),
+          drawer: const AppDrawer(selectedIndex: 4),
           body: DefaultTextStyle.merge(
               style: const TextStyle(color: Color(0xFFF3F0E7)),
               child: SingleChildScrollView(
@@ -408,6 +410,7 @@ class Faq extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 25),
             )),
+        drawer: const AppDrawer(selectedIndex: 4),
         body: DefaultTextStyle.merge(
           style: const TextStyle(color: Color(0xFFF3F0E7)),
           child: SingleChildScrollView(
