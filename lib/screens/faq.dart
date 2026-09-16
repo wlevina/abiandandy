@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
 class Faq extends StatelessWidget {
   const Faq({super.key});
-
-  static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
 
   bool isDesktopWidth(BuildContext context) =>
       MediaQuery.of(context).size.width >= 600;
@@ -145,7 +142,7 @@ class Faq extends StatelessWidget {
       TextSpan(children: [
         TextSpan(
             text:
-                'The Mint and Events by Alpha are both located in Sydney’s CBD and are within walking distance of each other. Both venues are easily accessible by train or bus, and if you’re driving, Wilson Car Park is available at xxx.',
+                'The Mint and Events by Alpha are both located in Sydney\'s CBD and are within a 12-minute walk of each other. Both venues are easily accessible by train or bus, and if you\'re driving, there are several Wilson Parking locations nearby.',
             style: TextStyle(
                 fontFamily: 'CoreBandiFace',
                 fontSize: detailsTextSize, fontWeight: FontWeight.normal)),
@@ -208,7 +205,7 @@ class Faq extends StatelessWidget {
       TextSpan(children: [
         TextSpan(
             text:
-                'We have sent personal invites to each guest that we can accommodate. We hope you understand!',
+                'We\'ve sent invitations to everyone we\'re able to accommodate, so we kindly ask that only those named on your invite attend. Thank you for understanding! ',
             style: TextStyle(
                 fontFamily: 'CoreBandiFace',
                 fontSize: detailsTextSize, fontWeight: FontWeight.normal)),
@@ -238,7 +235,7 @@ class Faq extends StatelessWidget {
       TextSpan(children: [
         TextSpan(
             text:
-                'We love your little ones! However, due to space limitations, we are only able to accommodate children of our overseas guests and those specifically named on the invitation.',
+                'We love your little ones! However, due to space limitations, we can only accommodate children who are travelling from overseas with their parents, or who are specifically named on your invitation. For everyone else, we hope you\'re able to enjoy a night off! ',
             style: TextStyle(
                 fontFamily: 'CoreBandiFace',
                 fontSize: detailsTextSize, fontWeight: FontWeight.normal)),
@@ -324,21 +321,7 @@ class Faq extends StatelessWidget {
 
     if (isDesktop && isMobileWidth(context) || (isMobileWidth(context))) {
       return Scaffold(
-          appBar: AppBar(
-              systemOverlayStyle:
-                  const SystemUiOverlayStyle(statusBarColor: Colors.white),
-              centerTitle: true,
-              backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
-              elevation: 0,
-              scrolledUnderElevation: 4,
-              iconTheme: const IconThemeData(color: backgroundColor),
-              title: const Text(
-                "A & A",
-                style: TextStyle(
-                    color: backgroundColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
-              )),
+          appBar: const WeddingAppBar(),
           drawer: const AppDrawer(selectedIndex: 4),
           body: DefaultTextStyle.merge(
               style: const TextStyle(color: Color(0xFFF3F0E7)),
@@ -395,21 +378,7 @@ class Faq extends StatelessWidget {
           )))));
     } else {
       return Scaffold(
-        appBar: AppBar(
-            systemOverlayStyle:
-                const SystemUiOverlayStyle(statusBarColor: Colors.white),
-            centerTitle: true,
-            backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
-            elevation: 0,
-            scrolledUnderElevation: 4,
-            iconTheme: const IconThemeData(color: backgroundColor),
-            title: const Text(
-              "A & A",
-              style: TextStyle(
-                  color: backgroundColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25),
-            )),
+        appBar: const WeddingAppBar(),
         drawer: const AppDrawer(selectedIndex: 4),
         body: DefaultTextStyle.merge(
           style: const TextStyle(color: Color(0xFFF3F0E7)),

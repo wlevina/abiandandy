@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OverseasGuests extends StatelessWidget {
   const OverseasGuests({super.key});
@@ -27,7 +29,57 @@ class OverseasGuests extends StatelessWidget {
     );
   }
 
-  Widget _bullet(String text, double fontSize) {
+  Widget _bullet(String text, double fontSize,
+      {String? boldPrefix, Map<String, String>? links}) {
+    final baseStyle = TextStyle(
+      fontFamily: 'CoreBandiFace',
+      fontSize: fontSize,
+      color: creamColor,
+      height: 1.5,
+    );
+
+    String remaining = text;
+    final spans = <InlineSpan>[];
+
+    if (boldPrefix != null) {
+      spans.add(TextSpan(
+        text: boldPrefix,
+        style: baseStyle.copyWith(fontWeight: FontWeight.bold),
+      ));
+      remaining = remaining.substring(boldPrefix.length);
+    }
+
+    if (links != null && links.isNotEmpty) {
+      final matches = <MapEntry<int, String>>[];
+      for (final key in links.keys) {
+        final idx = remaining.indexOf(key);
+        if (idx != -1) matches.add(MapEntry(idx, key));
+      }
+      matches.sort((a, b) => a.key.compareTo(b.key));
+
+      int cursor = 0;
+      for (final match in matches) {
+        if (match.key < cursor) continue;
+        if (match.key > cursor) {
+          spans.add(TextSpan(text: remaining.substring(cursor, match.key)));
+        }
+        final linkUrl = links[match.value]!;
+        spans.add(TextSpan(
+          text: match.value,
+          style: const TextStyle(decoration: TextDecoration.underline),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () => launchUrl(Uri.parse(linkUrl),
+                mode: LaunchMode.externalApplication),
+        ));
+        cursor = match.key + match.value.length;
+      }
+      if (cursor < remaining.length) {
+        spans.add(TextSpan(text: remaining.substring(cursor)));
+      }
+    } else {
+      spans.add(TextSpan(text: remaining));
+    }
+
     return Padding(
       padding: const EdgeInsets.only(top: 4.0, bottom: 4.0, left: 10.0),
       child: Row(
@@ -41,14 +93,8 @@ class OverseasGuests extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: SelectableText(
-              text,
-              style: TextStyle(
-                fontFamily: 'CoreBandiFace',
-                fontSize: fontSize,
-                color: creamColor,
-                height: 1.5,
-              ),
+            child: SelectableText.rich(
+              TextSpan(children: spans, style: baseStyle),
             ),
           ),
         ],
@@ -56,7 +102,8 @@ class OverseasGuests extends StatelessWidget {
     );
   }
 
-  Widget _paragraph(String text, double fontSize, {TextAlign? align}) {
+  Widget _paragraph(String text, double fontSize,
+      {TextAlign? align, bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: SelectableText(
@@ -67,6 +114,7 @@ class OverseasGuests extends StatelessWidget {
           fontSize: fontSize,
           color: creamColor,
           height: 1.5,
+          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
         ),
       ),
     );
@@ -119,10 +167,20 @@ class OverseasGuests extends StatelessWidget {
           fontSize,
         ),
         const SizedBox(height: 8),
-        _bullet('The Porter House \$\$\$', fontSize),
-        _bullet('Meriton Suites \$\$\$', fontSize),
-        _bullet('The Sebel \$\$', fontSize),
-        _bullet('Ibis \$', fontSize),
+        _bullet(
+            'Sofitel Sydney Darling Harbour \$\$\$\$ — modern upscale hotel in Darling Harbour. High level rooms can include harbour and city views',
+            fontSize,
+            boldPrefix: 'Sofitel Sydney Darling Harbour \$\$\$\$'),
+        _bullet(
+            'Meriton Suites \$\$\$ — spacious apartment-style rooms, great if you want more space or are staying a few nights',
+            fontSize,
+            boldPrefix: 'Meriton Suites \$\$\$'),
+        _bullet(
+            'The Sebel \$\$ — comfortable mid-range option, well located for both venues',
+            fontSize,
+            boldPrefix: 'The Sebel \$\$'),
+        _bullet('Ibis \$ — simple and budget-friendly', fontSize,
+            boldPrefix: 'Ibis \$'),
         const SizedBox(height: 8),
         _paragraph(
           'Of course, feel free to book wherever you like! We recommend '
@@ -131,8 +189,7 @@ class OverseasGuests extends StatelessWidget {
           fontSize,
         ),
         _paragraph(
-          "Please note that we don't have any links or discounts "
-          'available.',
+          "We haven't arranged a room block, so just book directly through your preferred site. ",
           fontSize,
         ),
       ],
@@ -144,25 +201,101 @@ class OverseasGuests extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _paragraph(
-          "We've compiled a list of some of our favourite things to do "
-          "while you're in Sydney!",
+          "While you're in town, here are some of our favourite spots in Sydney! If you’d like more local tips and recommendations, please feel free to reach out to us directly. ",
           fontSize,
         ),
         const SizedBox(height: 8),
+        _paragraph(
+          "Eat & Drink",
+          fontSize,
+          bold: true,
+        ),
+        const SizedBox(height: 8),
         _bullet(
-            'Grab a drink with harbour views at Opera Bar and Squires '
-            'Landing',
-            fontSize),
-        _bullet('Go for a walk through the Botanical Gardens', fontSize),
+            'Enjoy harbour views over a drink at Opera Bar or The Oriana',
+            fontSize,
+            links: {
+              'Opera Bar':
+                  'https://www.google.com/maps/search/?api=1&query=Opera+Bar+Sydney&query_place_id=ChIJB5NuYGauEmsROhQEpJXe5qo',
+              'The Oriana':
+                  'https://www.google.com/maps/search/?api=1&query=Squires+Landing+Sydney&query_place_id=ChIJDcRr3A6vEmsRN3dKYsaQawI',
+            }),
+        _bullet('Pick up a banh mi at Marrickville Pork Roll — Darling Square',
+            fontSize,
+            links: {
+              'Marrickville Pork Roll — Darling Square':
+                  'https://www.google.com/maps/search/?api=1&query=Marrickville+Pork+Roll+Sydney&query_place_id=ChIJJaaNZW2vEmsRkr5f5mOgNjQ',
+            }),
+        _bullet('Stop for coffee at Haven or Stitch Coffee QVB', fontSize,
+            links: {
+              'Haven':
+                  'https://www.google.com/maps/search/?api=1&query=Haven+Coffee+Sydney&query_place_id=ChIJsz7gdjmvEmsRp8ZOyC6med0',
+              'Stitch Coffee QVB': 'https://maps.app.goo.gl/g5CyyqiYqctLfFRt9',
+            }),
         _bullet(
-            'Grab a banh mi at Marrickville Pork Roll (Darling Square '
-            'location)',
-            fontSize),
-        _bullet('Grab a coffee at Haven', fontSize),
+            'Snack on pastries at Tenacious Bakehouse or AP Bakery', fontSize,
+            links: {
+              'Tenacious Bakehouse':
+                  'https://www.google.com/maps/search/?api=1&query=Tenacious+Bakehouse+Sydney&query_place_id=ChIJi_M0Jg2vEmsRe5F0CLYnBJk',
+              'AP Bakery':
+                  'https://www.google.com/maps/search/?api=1&query=AP+Bakery+Sydney&query_place_id=ChIJhZn8INevEmsRf8uU48OObm0',
+            }),
+        _bullet('Grab a scoop at Gelato Messina', fontSize, links: {
+          'Gelato Messina':
+              'https://www.google.com/maps/search/?api=1&query=Gelato+Messina+Circular+Quay&query_place_id=ChIJlyAUd0KuEmsRUUgk0FiWG14',
+        }),
+        _bullet('Sip on cocktails at PS40 or Maybe Sammy', fontSize, links: {
+          'PS40':
+              'https://www.google.com/maps/search/?api=1&query=PS40+Sydney&query_place_id=ChIJqcU0ST-uEmsRClU9RTRiAk4',
+          'Maybe Sammy': 'https://maps.app.goo.gl/e5wXquuB5oK38suV8',
+        }),
         _bullet(
-            'Snack on some pastries at Tenacious Bakehouse or AP Bakery',
-            fontSize),
-        _bullet('Sip on cocktails at PS40', fontSize),
+            'Browse fresh seafood and grab a bite at the Sydney Fish Market',
+            fontSize,
+            links: {
+              'Sydney Fish Market':
+                  'https://www.google.com/maps/search/?api=1&query=Sydney+Fish+Market&query_place_id=ChIJqy_-dTGuEmsRtBGe8eEFI8E',
+            }),
+        const SizedBox(height: 8),
+        _paragraph(
+          "See & Do",
+          fontSize,
+          bold: true,
+        ),
+        _bullet('Go for a walk through the Royal Botanical Gardens', fontSize,
+            links: {
+              'Royal Botanical Gardens':
+                  'https://www.google.com/maps/search/?api=1&query=Royal+Botanic+Garden+Sydney&query_place_id=ChIJWaTdYGuuEmsRoOfx-Wh9AQ8',
+            }),
+        _bullet(
+            'Take in the Sydney Opera House and Sydney Harbour Bridge — even just walking around Circular Quay and along Sydney Harbour is worth the trip',
+            fontSize,
+            links: {
+              'Sydney Opera House':
+                  'https://www.google.com/maps/search/?api=1&query=Sydney+Opera+House&query_place_id=ChIJ3S-JXmauEmsRUcIaWtf4MzE',
+              'Sydney Harbour Bridge':
+                  'https://www.google.com/maps/search/?api=1&query=Sydney+Harbour+Bridge&query_place_id=ChIJ49XqJV2uEmsRPsTAF7eOlGg',
+            }),
+        _bullet('Go for a dip at Bondi Beach or Coogee Beach', fontSize,
+            links: {
+              'Bondi Beach':
+                  'https://www.google.com/maps/search/?api=1&query=Bondi+Beach+Sydney&query_place_id=ChIJx4FyRJytEmsReOktxgkYwyA',
+              'Coogee Beach':
+                  'https://www.google.com/maps/search/?api=1&query=Coogee+Sydney&query_place_id=ChIJ4ZOCY5yxEmsR4LIyFmh9AQU',
+            }),
+        _bullet(
+            'Take the ferry from Circular Quay to Manly Beach for a beachy day trip',
+            fontSize,
+            links: {
+              'Circular Quay': 'https://maps.app.goo.gl/4vRbh8rqW3okQ23V9',
+              'Manly Beach': 'https://maps.app.goo.gl/qu43HCr2XAC1EmTH6',
+            }),
+        _bullet('Visit Taronga Zoo to see all the unique Australian wildlife',
+            fontSize,
+            links: {
+              'Taronga Zoo': 'https://maps.app.goo.gl/A9WnhPhoH6jDb8ZZ7',
+            }),
+
       ],
     );
   }
@@ -181,16 +314,22 @@ class OverseasGuests extends StatelessWidget {
           children: [
             _paragraph(
               'Sydney is a very walkable city, especially around the CBD '
-              'and harbour areas. Both our ceremony and reception venues '
-              'are centrally located, making it easy to move between them '
-              'and nearby accommodation.',
+              'and harbour — and both our venues are right in the middle of the CBD. ',
               fontSize,
             ),
-            _paragraph(
-              'There are plenty of public transport options including '
-              'train, light rail and bus.',
-              fontSize,
-            ),
+            const SizedBox(height: 8),
+            _bullet(
+                'Between the ceremony and reception: The Mint and Events by Alpha are about a 10-minute walk apart. If you\'d rather not walk in your formal wear, taxis and Ubers are readily available. ',
+                fontSize,
+                boldPrefix: 'Between the ceremony and reception:'),
+            _bullet(
+                'Public transport: Sydney\'s trains, light rail and buses all run on the Opal card system — you can simply tap on with a contactless Visa or Mastercard, or a linked phone/watch (just be aware your bank may charge international transaction fees). You can also purchase a physical Opal card if you\'d prefer.',
+                fontSize,
+                boldPrefix: 'Public transport:'),
+            _bullet(
+                'Taxis & rideshare: Taxis and Ubers operate widely across the city.',
+                fontSize,
+                boldPrefix: 'Taxis & rideshare:'),
           ],
         ),
       ],

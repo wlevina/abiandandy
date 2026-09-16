@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class Reception extends StatelessWidget {
@@ -17,13 +18,6 @@ class Reception extends StatelessWidget {
   bool isMobileWidth(BuildContext context) =>
       MediaQuery.of(context).size.width < 600;
 
-  // Matches Introduction's spacing scale so the divider sits with the same
-  // rhythm across Introduction/Ceremony/Reception on mobile.
-  double _spacingScale(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    return (screenHeight / 1625).clamp(0.4, 1.0);
-  }
-
   Future<void> _launchMaps() async {
     final uri = Uri.parse(googleMapsUrl);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -37,6 +31,7 @@ class Reception extends StatelessWidget {
     double venueTextSize = screenWidth > 975 ? 27.0 : 27.0;
     double addressTextSize = screenWidth > 975 ? 21.0 : 18.0;
     double linkTextSize = screenWidth > 975 ? 15.0 : 16.0;
+    double gapSize = 25.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -50,18 +45,8 @@ class Reception extends StatelessWidget {
             color: creamColor,
           ),
         ),
-        const SizedBox(height: 25),
-        SelectableText(
-          'Cocktails from 5:30pm',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: detailsTextSize,
-            color: creamColor,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: 25),
+        SizedBox(height: gapSize),
+      
         SelectableText(
           'Events by Alpha',
           textAlign: TextAlign.center,
@@ -99,7 +84,18 @@ class Reception extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 25),
+        SizedBox(height: gapSize),
+        SelectableText(
+          'Cocktails from 5:30pm followed by dinner and dancing. After-party until late!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'CoreBandiFace',
+            fontSize: detailsTextSize,
+            color: creamColor,
+            letterSpacing: 0.5,
+          ),
+        ),
+        SizedBox(height: gapSize),
       ],
     );
   }
@@ -128,16 +124,18 @@ class Reception extends StatelessWidget {
                   padding: const EdgeInsets.all(2.0),
                   width: screenWidth * 0.8,
                   child: _reception(context)),
-              SizedBox(height: 180 * _spacingScale(context)),
-              // SquiggleDivider(
-              //   width: screenWidth - dividerSize * 2,
-              //   color: creamColor,
-              // ),
+              SizedBox(height: 230 * spacingScale(context)),
+              SquiggleDivider(
+                width: screenWidth - dividerSize * 2,
+                color: creamColor,
+              ),
             ],
           ),
         ),
       );
     } else {
+      double heroHeight = screenHeight * .52;
+
       return Container(
         color: backgroundColor,
         child: SingleChildScrollView(
@@ -150,7 +148,7 @@ class Reception extends StatelessWidget {
                   Expanded(
                       child: SizedBox(
                           width: screenWidth,
-                          height: screenHeight,
+                          height: heroHeight,
                           child: Image.asset(
                             'assets/images/alpha_events.png',
                           ))),
@@ -162,16 +160,16 @@ class Reception extends StatelessWidget {
                                 constraints:
                                     const BoxConstraints(maxWidth: 550),
                                 child: Padding(
-                                    padding: const EdgeInsets.all(100.0),
+                                    padding: const EdgeInsets.all(40.0),
                                     child: _reception(context))))),
                 ],
               ),
             ),
           ),
-          // SquiggleDivider(
-          //   width: screenWidth - dividerSize * 2,
-          //   color: creamColor,
-          // ),
+          SquiggleDivider(
+            width: screenWidth - dividerSize * 2,
+            color: creamColor,
+          ),
         ])),
       );
     }

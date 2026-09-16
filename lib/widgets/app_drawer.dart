@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/home.dart';
 import 'package:wedding_website/screens/faq.dart';
 import 'package:wedding_website/screens/overseas_guests.dart';
@@ -44,6 +46,8 @@ void navigateFromDrawer(BuildContext context, int index) {
     return;
   }
 
+  if (index == 1) RsvpSheetsApi.warmUp();
+
   final Widget page = switch (index) {
     1 => const RsvpForm(),
     2 => const WeddingAgenda(),
@@ -57,6 +61,71 @@ void navigateFromDrawer(BuildContext context, int index) {
     fadeSlideRoute(page),
     (route) => route.isFirst,
   );
+}
+
+// Text alternative to the default hamburger icon, styled to match the
+// site's display font. Opens the same drawer the icon would have.
+class AppMenuButton extends StatelessWidget {
+  const AppMenuButton({super.key});
+
+  static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 6),
+        child: TextButton(
+          onPressed: () => Scaffold.of(context).openDrawer(),
+          style: TextButton.styleFrom(
+            foregroundColor: backgroundColor,
+          ),
+          child: const Text(
+            'Menu',
+            style: TextStyle(
+              fontFamily: 'CoreBandiFace',
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class WeddingAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const WeddingAppBar({super.key});
+
+  static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+      ),
+      centerTitle: true,
+      backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
+      elevation: 0,
+      scrolledUnderElevation: 4,
+      iconTheme: const IconThemeData(color: backgroundColor),
+      leading: const AppMenuButton(),
+      leadingWidth: 90,
+      title: const Text(
+        "A & A",
+        style: TextStyle(
+          color: backgroundColor,
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 }
 
 class AppDrawer extends StatelessWidget {

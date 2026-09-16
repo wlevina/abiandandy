@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class Ceremony extends StatelessWidget {
@@ -16,13 +17,6 @@ class Ceremony extends StatelessWidget {
 
   bool isMobileWidth(BuildContext context) =>
       MediaQuery.of(context).size.width < 600;
-
-  // Matches Introduction's spacing scale so the divider sits with the same
-  // rhythm across Introduction/Ceremony/Reception on mobile.
-  double _spacingScale(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    return (screenHeight / 1625).clamp(0.4, 1.0);
-  }
 
   Future<void> _launchMaps() async {
     final uri = Uri.parse(googleMapsUrl);
@@ -41,6 +35,7 @@ class Ceremony extends StatelessWidget {
     double venueTextSize = screenWidth > 975 ? 27.0 : 27.0;
     double addressTextSize = screenWidth > 975 ? 21.0 : 18.0;
     double linkTextSize = screenWidth > 975 ? 15.0 : 16.0;
+    double gapSize = 25.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -54,18 +49,8 @@ class Ceremony extends StatelessWidget {
             color: creamColor,
           ),
         ),
-        const SizedBox(height: 25),
-        SelectableText(
-          'Please arrive by 12:15pm for a 12:30pm start',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: detailsTextSize,
-            color: creamColor,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: 25),
+        SizedBox(height: gapSize),
+
         SelectableText(
           'The Mint',
           textAlign: TextAlign.center,
@@ -103,7 +88,18 @@ class Ceremony extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 25),
+        SizedBox(height: gapSize),
+        SelectableText(
+          'Please arrive by 12:00pm for a 12:30pm start',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: 'CoreBandiFace',
+            fontSize: detailsTextSize,
+            color: creamColor,
+            letterSpacing: 0.5,
+          ),
+        ),
+        SizedBox(height: gapSize),
       ],
     );
   }
@@ -121,6 +117,7 @@ class Ceremony extends StatelessWidget {
       return Container(
         color: backgroundColor,
         constraints: BoxConstraints(minHeight: screenHeight),
+        padding: EdgeInsets.only(bottom: spacingScale(context)),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -132,7 +129,7 @@ class Ceremony extends StatelessWidget {
                   padding: const EdgeInsets.all(2.0),
                   width: screenWidth * 0.8,
                   child: _ceremony(context)),
-              SizedBox(height: 180 * _spacingScale(context)),
+              SizedBox(height: 220 * spacingScale(context)),
               SquiggleDivider(
                 width: screenWidth - dividerSize * 2,
                 color: creamColor,
@@ -142,8 +139,11 @@ class Ceremony extends StatelessWidget {
         ),
       );
     } else {
+      double heroHeight = screenHeight * .52;
+
       return Container(
         color: backgroundColor,
+        //padding: EdgeInsets.only(bottom: spacingScale(context)),
         child: SingleChildScrollView(
             child: Column(children: [
           Center(
@@ -154,7 +154,7 @@ class Ceremony extends StatelessWidget {
                   Expanded(
                       child: SizedBox(
                           width: screenWidth,
-                          height: screenHeight,
+                          height: heroHeight,
                           child: Image.asset(
                             'assets/images/the_mint.png',
                           ))),
@@ -166,15 +166,11 @@ class Ceremony extends StatelessWidget {
                                 constraints:
                                     const BoxConstraints(maxWidth: 550),
                                 child: Padding(
-                                    padding: const EdgeInsets.all(100.0),
+                                    padding: const EdgeInsets.all(40.0),
                                     child: _ceremony(context))))),
                 ],
               ),
             ),
-          ),
-          SquiggleDivider(
-            width: screenWidth - dividerSize * 2,
-            color: creamColor,
           ),
         ])),
       );

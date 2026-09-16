@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/ceremony.dart';
 import 'package:wedding_website/widgets/introduction.dart';
+import 'package:wedding_website/widgets/photobooth.dart';
 import 'package:wedding_website/widgets/reception.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
@@ -48,6 +49,8 @@ class MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         scrolledUnderElevation: 4,
         iconTheme: const IconThemeData(color: backgroundColor),
+        leading: const AppMenuButton(),
+        leadingWidth: 90,
         title: const Text(
           "A & A",
           style: TextStyle(
@@ -66,6 +69,7 @@ class MyHomePageState extends State<MyHomePage> {
             Introduction(),
             Ceremony(),
             Reception(),
+            Photobooth(),
             SignOff(),
           ],
         ),

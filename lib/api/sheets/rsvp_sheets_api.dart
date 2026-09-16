@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,14 @@ import 'package:wedding_website/model/guests.dart';
 class RsvpSheetsApi {
   static const _endpoint = String.fromEnvironment('RSVP_API_URL');
   static const _token = String.fromEnvironment('RSVP_API_TOKEN');
+
+  // Fire-and-forget request that exercises the same lookup path (spreadsheet
+  // open + full read) without matching anything, so Apps Script's container
+  // is already warm by the time the user finishes typing and taps Confirm.
+  // Call this as soon as they tap into the RSVP flow, not on every keystroke.
+  static void warmUp() {
+    unawaited(_post({'action': 'lookup', 'name': ''}));
+  }
 
   static Future<(Guest?, List<Guest>)> getGuestAndParty(String name) async {
     final response = await _post({'action': 'lookup', 'name': name});

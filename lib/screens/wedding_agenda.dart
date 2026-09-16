@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
 class WeddingAgenda extends StatelessWidget {
   const WeddingAgenda({super.key});
 
-  static const Color backgroundColor = Color(0xFF687351);
   static const Color creamColor = Color(0xFFF3F0E7);
 
   bool isDesktopWidth(BuildContext context) =>
@@ -35,20 +33,20 @@ class WeddingAgenda extends StatelessWidget {
   }
 
   Widget _weddingDayTitle(BuildContext context) {
-    double titleTextSize = screenWidth(context) > 975 ? 45.0 : 36.0;
+    double titleTextSize = screenWidth(context) > 975 ? 30.0 : 24.0;
 
     return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(
           text: 'Ceremony',
           style: TextStyle(
-            fontFamily: 'Madelyn',
+            fontFamily: 'CoreBandiFace',
             fontSize: titleTextSize
           )),
     );
   }
 
-  Widget _weddingDay(BuildContext context) {
+  Widget _ceremony(BuildContext context) {
     //double titleTextSize = screenWidth(context) > 975 ? 28.0 : 24.0;
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
@@ -60,11 +58,7 @@ class WeddingAgenda extends StatelessWidget {
         children: [
       SelectableText.rich(
         textAlign: TextAlign.left,
-        TextSpan(children: [
-          // TextSpan(
-          //     text: 'wedding day\n',
-          //     style: TextStyle(
-          //         fontSize: titleTextSize, fontWeight: FontWeight.normal)),
+              TextSpan(children: [
           TextSpan(
               text: 'Date: ',
               style: TextStyle(
@@ -91,7 +85,7 @@ class WeddingAgenda extends StatelessWidget {
               style: TextStyle(
                   fontSize: detailsTextSize, fontWeight: FontWeight.bold)),
           TextSpan(
-              text: 'Arrive by 12:15pm for a 12:30pm start\n',
+                    text: 'Arrive by 12:00pm for a 12:30pm start\n',
               style: TextStyle(fontSize: detailsTextSize)),
           TextSpan(
               text: '\nDress Code: ',
@@ -105,21 +99,21 @@ class WeddingAgenda extends StatelessWidget {
     );
   }
 
-  Widget _recoveryTitle(BuildContext context) {
-    double titleTextSize = screenWidth(context) > 975 ? 45.0 : 36.0;
+  Widget _receptionTitle(BuildContext context) {
+    double titleTextSize = screenWidth(context) > 975 ? 30.0 : 24.0;
 
     return SelectableText.rich(
       textAlign: TextAlign.left,
       TextSpan(
           text: 'Reception',
           style: TextStyle(
-            fontFamily: 'Madelyn',
+            fontFamily: 'CoreBandiFace',
             fontSize: titleTextSize
           )),
     );
   }
 
-  Widget _recoveryBrunch(BuildContext context) {
+  Widget _reception(BuildContext context) {
     //double titleTextSize = screenWidth(context) > 975 ? 28.0 : 24.0;
     double detailsTextSize = screenWidth(context) > 975 ? 20.0 : 18.0;
 
@@ -162,7 +156,8 @@ class WeddingAgenda extends StatelessWidget {
               style: TextStyle(
                   fontSize: detailsTextSize, fontWeight: FontWeight.bold)),
           TextSpan(
-              text: 'Cocktails from 5:30pm\n',
+                    text:
+                        'Cocktails from 5:30pm followed by dinner and dancing. After-party until late!\n',
               style: TextStyle(fontSize: detailsTextSize)),
           TextSpan(
               text: '\nDress Code: ',
@@ -184,21 +179,7 @@ class WeddingAgenda extends StatelessWidget {
 
     if (isDesktop && isMobileWidth(context) || (isMobileWidth(context))) {
       return Scaffold(
-          appBar: AppBar(
-              systemOverlayStyle:
-                  const SystemUiOverlayStyle(statusBarColor: Colors.white),
-              centerTitle: true,
-              backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
-              elevation: 0,
-              scrolledUnderElevation: 4,
-              iconTheme: const IconThemeData(color: backgroundColor),
-              title: const Text(
-                "A & A",
-                style: TextStyle(
-                    color: backgroundColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
-              )),
+          appBar: const WeddingAppBar(),
           drawer: const AppDrawer(selectedIndex: 2),
           body: SingleChildScrollView(
               child: Center(
@@ -216,11 +197,11 @@ class WeddingAgenda extends StatelessWidget {
                   const SizedBox(height: 50),
                   _weddingDayTitle(context),
                   const SizedBox(height: 12),
-                  _weddingDay(context),
+                  _ceremony(context),
                   SizedBox(height: screenHeight * 0.08),
-                  _recoveryTitle(context),
+                  _receptionTitle(context),
                   const SizedBox(height: 12),
-                  _recoveryBrunch(context),
+                  _reception(context),
                   SizedBox(height: screenHeight * 0.1),
                   const SignOff()
                 ],
@@ -229,21 +210,7 @@ class WeddingAgenda extends StatelessWidget {
           ))));
     } else {
       return Scaffold(
-        appBar: AppBar(
-            systemOverlayStyle:
-                const SystemUiOverlayStyle(statusBarColor: Colors.white),
-            centerTitle: true,
-            backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
-            elevation: 0,
-            scrolledUnderElevation: 4,
-            iconTheme: const IconThemeData(color: backgroundColor),
-            title: const Text(
-              "A & A",
-              style: TextStyle(
-                  color: backgroundColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25),
-            )),
+        appBar: const WeddingAppBar(),
         drawer: const AppDrawer(selectedIndex: 2),
         body: SingleChildScrollView(
           child: Center(
@@ -256,10 +223,12 @@ class WeddingAgenda extends StatelessWidget {
                   _title(context),
                   SizedBox(height: screenHeight * .075),
                   _weddingDayTitle(context),
-                  SizedBox(width: 400, child: _weddingDay(context)),
+                  const SizedBox(height: 15),
+                  SizedBox(width: 400, child: _ceremony(context)),
                   SizedBox(height: screenHeight * .075),
-                  _recoveryTitle(context),
-                  SizedBox(width: 400, child: _recoveryBrunch(context)),
+                  _receptionTitle(context),
+                  const SizedBox(height: 15),
+                  SizedBox(width: 400, child: _reception(context)),
                   const SignOff()
                 ],
               ),

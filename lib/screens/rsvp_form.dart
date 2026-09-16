@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/home.dart';
 import 'package:wedding_website/model/guests.dart';
@@ -49,6 +48,12 @@ class RsvpFormState extends State<RsvpForm> {
   String? _resolvedForName;
 
   int _validationRequestId = 0;
+
+  // True once the user has tapped Confirm on the (revealed) party list —
+  // only then do unanswered party members get their "Not answered yet"
+  // status highlighted, so collapsed cards don't look like errors on
+  // first load.
+  bool _submitAttempted = false;
 
   // Guards against a second Confirm tap firing while one is already in
   // flight — without this, an impatient double-tap starts a second lookup
@@ -311,6 +316,8 @@ class RsvpFormState extends State<RsvpForm> {
 
   Widget _partyCard(BuildContext context, _PartyMember member) {
     final isSelf = primaryGuest != null && member.name == primaryGuest!.name;
+    final isUnanswered = member.ceremony.isEmpty || member.reception.isEmpty;
+    final showUnansweredHighlight = _submitAttempted && isUnanswered;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +344,12 @@ class RsvpFormState extends State<RsvpForm> {
                         _statusText(member),
                         style: TextStyle(
                             fontSize: 12.5,
-                            color: creamColor.withValues(alpha: 0.65)),
+                            fontWeight: showUnansweredHighlight
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: showUnansweredHighlight
+                                ? errorColor
+                                : creamColor.withValues(alpha: 0.65)),
                       ),
                     ],
                   ),
@@ -532,6 +544,7 @@ class RsvpFormState extends State<RsvpForm> {
           // flagging required fields nobody's had a chance to answer yet.
           // A second Confirm (below) actually submits.
           _resolvedForName = typedName;
+          _submitAttempted = false;
           // Clear a stale "can't find invite" error left over from an
           // earlier failed attempt, without validating the newly-revealed
           // (and not yet answered) party fields.
@@ -541,6 +554,7 @@ class RsvpFormState extends State<RsvpForm> {
         // Not found — fall through so the "can't find invite" error shows.
       }
 
+      setState(() => _submitAttempted = true);
       final form = formKey.currentState!;
       final isValid = form.validate();
 
@@ -607,6 +621,7 @@ class RsvpFormState extends State<RsvpForm> {
                         controllerName.clear();
                         primaryGuest = null;
                         _resolvedForName = null;
+                        _submitAttempted = false;
                         _setParty([]);
                       });
                     },
@@ -685,6 +700,7 @@ class RsvpFormState extends State<RsvpForm> {
                   controllerName.clear();
                   primaryGuest = null;
                   _resolvedForName = null;
+                  _submitAttempted = false;
                   _setParty([]);
                 });
               },
@@ -750,21 +766,7 @@ class RsvpFormState extends State<RsvpForm> {
 
     if (isDesktop && isMobileWidth(context) || (isMobileWidth(context))) {
       return Scaffold(
-          appBar: AppBar(
-              systemOverlayStyle:
-                  const SystemUiOverlayStyle(statusBarColor: Colors.white),
-              centerTitle: true,
-              backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
-              elevation: 0,
-              scrolledUnderElevation: 4,
-              iconTheme: const IconThemeData(color: backgroundColor),
-              title: const Text(
-                "A & A",
-                style: TextStyle(
-                    color: backgroundColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
-              )),
+          appBar: const WeddingAppBar(),
           drawer: const AppDrawer(selectedIndex: 1),
           body: SingleChildScrollView(
               child: Center(
@@ -793,21 +795,7 @@ class RsvpFormState extends State<RsvpForm> {
           ))));
     } else {
       return Scaffold(
-          appBar: AppBar(
-              systemOverlayStyle:
-                  const SystemUiOverlayStyle(statusBarColor: Colors.white),
-              centerTitle: true,
-              backgroundColor: const Color.fromRGBO(243, 240, 231, 0.75),
-              elevation: 0,
-              scrolledUnderElevation: 4,
-              iconTheme: const IconThemeData(color: backgroundColor),
-              title: const Text(
-                "A & A",
-                style: TextStyle(
-                    color: backgroundColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
-              )),
+          appBar: const WeddingAppBar(),
           drawer: const AppDrawer(selectedIndex: 1),
           body: SingleChildScrollView(
               child: Center(

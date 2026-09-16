@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/screens/rsvp_form.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
+import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class Introduction extends StatelessWidget {
@@ -33,11 +35,6 @@ class Introduction extends StatelessWidget {
     return isMobileWidth(context) ? scale.clamp(1.0, 1.15) : scale.clamp(0.85, 1.0);
   }
 
-  double _spacingScale(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    return (screenHeight / 1625).clamp(0.4, 1.0);
-  }
-
   // Small hand-drawn-style squiggle used under the date/location text.
   Widget _squiggle({double width = 90}) {
     return SquiggleDivider(width: width, height: 14, color: creamColor);
@@ -56,7 +53,7 @@ class Introduction extends StatelessWidget {
 
   Widget _detailsRow(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double spacingScale = _spacingScale(context);
+    double scale = spacingScale(context);
     double labelSize = (screenWidth > 975 ? 22.5 : 18.0) * _textScale(context);
     double letterSpacing = 1.5;
 
@@ -72,7 +69,6 @@ class Introduction extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text('13 MARCH 2027', style: textStyle),
-        Text('AT 12:00 PM', style: textStyle),
         const SizedBox(height: 6),
         _squiggle(),
       ],
@@ -81,8 +77,7 @@ class Introduction extends StatelessWidget {
     final locationColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('SYDNEY', style: textStyle),
-        Text('AUSTRALIA', style: textStyle),
+        Text('SYDNEY, AUSTRALIA', style: textStyle),
         const SizedBox(height: 6),
         _squiggle(),
       ],
@@ -93,9 +88,9 @@ class Introduction extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           dateColumn,
-          SizedBox(height: 20 * spacingScale),
+          SizedBox(height: 20 * scale),
           _centerImage(context),
-          SizedBox(height: 20 * spacingScale),
+          SizedBox(height: 20 * scale),
           locationColumn,
         ],
       );
@@ -127,7 +122,7 @@ class Introduction extends StatelessWidget {
     double fontSize = (screenWidth > 975 ? 20.0 : 16.0) * _textScale(context);
 
     return Text(
-      'WE CORDIALLY INVITE YOU TO CELEBRATE OUR MARRIAGE TOGETHER WITH OUR FAMILIES',
+      'WE CAN\'T WAIT TO CELEBRATE WITH YOU',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontFamily: 'CoreBandiFace',
@@ -171,6 +166,7 @@ class Introduction extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: () {
+        RsvpSheetsApi.warmUp();
         Navigator.push(context, fadeSlideRoute(const RsvpForm()));
       },
       style: ElevatedButton.styleFrom(
@@ -196,9 +192,25 @@ class Introduction extends StatelessWidget {
     );
   }
 
+  Widget _rsvpNote(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = (screenWidth > 975 ? 18.0 : 14.0) * _textScale(context);
+
+    return Text(
+      "Kindly RSVP by December 13",
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontFamily: 'CoreBandiFace',
+        fontSize: fontSize,
+        color: creamColor,
+        letterSpacing: 1.0,
+      ),
+    );
+  }
+
   Widget _invitation(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double spacingScale = _spacingScale(context);
+    double scale = spacingScale(context);
     double horizontalPadding = screenWidth > 975 ? 75 : 24;
     double wideWidth =
         (screenWidth > 975 ? 1250 : 500) * _contentScale(context);
@@ -212,12 +224,14 @@ class Introduction extends StatelessWidget {
           children: [
             _title(context),
             _detailsRow(context),
-            SizedBox(height: 60 * spacingScale),
+            SizedBox(height: 60 * scale),
             _inviteLine(context),
-            SizedBox(height: 44 * spacingScale),
+            SizedBox(height: 44 * scale),
             _countDown(context),
-            SizedBox(height: 56 * spacingScale),
+            SizedBox(height: 56 * scale),
             _rsvp(context),
+            SizedBox(height: 25 * scale),
+            _rsvpNote(context),
           ],
         ),
       ),
@@ -237,7 +251,7 @@ class Introduction extends StatelessWidget {
         Center(
           child: _invitation(context),
         ),
-        SizedBox(height: 180 * _spacingScale(context)),
+        SizedBox(height: 220 * spacingScale(context)),
         SquiggleDivider(
           width: screenWidth - dividerSize * 2,
           color: creamColor,
@@ -250,13 +264,15 @@ class Introduction extends StatelessWidget {
       color: backgroundColor,
       padding: EdgeInsets.fromLTRB(
         0,
-        (mobile ? 45 : 75) * _spacingScale(context),
+        (mobile ? 1 : 75) * spacingScale(context),
         0,
-        75 * _spacingScale(context),
+        75 * spacingScale(context),
       ),
       constraints:
           mobile ? BoxConstraints(minHeight: screenHeight) : const BoxConstraints(),
-      child: mobile ? Center(child: content) : content,
+      child: mobile
+          ? Align(alignment: Alignment.bottomCenter, child: content)
+          : content,
     );
   }
 }
