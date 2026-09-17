@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:wedding_website/widgets/breakpoints.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
 class SignOff extends StatelessWidget {
   const SignOff({super.key});
 
   static const Color creamColor = Color(0xFFF3F0E7);
-
-  bool isDesktopWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600;
-
-  bool isMobileWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
 
   Widget _signOff(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

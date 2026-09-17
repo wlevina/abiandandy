@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/screens/rsvp_form.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
+import 'package:wedding_website/widgets/breakpoints.dart';
 import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
@@ -11,24 +12,30 @@ class Introduction extends StatelessWidget {
   static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
   static const Color creamColor = Color(0xFFF3F0E7);
 
-  bool isDesktopWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600;
+  // Width where hand-tuned phone values (e.g. 350 title, 180 image) apply exactly; below it, sizing stays flat.
+  static const double _phoneReferenceWidth = 390;
 
-  bool isMobileWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
+  // Interpolates linearly between the phone value (at 390px) and the desktop value (at mobileBreakpoint),
+  // so a tablet at e.g. 768px scales smoothly instead of inheriting the undersized phone hero.
+  double _scaleWidth(
+      BuildContext context, double phoneValue, double desktopValue) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth >= mobileBreakpoint) return desktopValue;
+    double t = ((screenWidth - _phoneReferenceWidth) /
+            (mobileBreakpoint - _phoneReferenceWidth))
+        .clamp(0.0, 1.0);
+    return phoneValue + (desktopValue - phoneValue) * t;
+  }
 
-  // On short viewports (e.g. a laptop browser window), whitespace shrinks
-  // hard first — it's cheap to cut — while the title/images/text only
-  // shrink a little, so the section still fits without scrolling but
-  // doesn't look shrunken. Both stay at 1.0 on tall screens.
+  // Whitespace is cheap to cut, so it shrinks hard first (clamped 0.68-1.0) on short viewports,
+  // while title/images/text only shrink a little — section fits without looking shrunken.
   double _contentScale(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return (screenHeight / 1312.5).clamp(0.68, 1.0);
   }
 
-  // Text barely affects the vertical budget compared to the title/champagne
-  // images, so it can stay much closer to full size without bringing back
-  // the RSVP overflow — a higher floor keeps it legible on short screens.
+  // Text barely affects the vertical budget vs. the title/champagne images, so it keeps
+  // a higher floor (0.85-1.0 desktop, 1.0-1.15 mobile) without bringing back RSVP overflow.
   double _textScale(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double scale = screenHeight / 1312.5;
@@ -41,8 +48,8 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _title(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double titleWidth = (screenWidth > 975 ? 825.0 : 350.0) * _contentScale(context);
+    double titleWidth =
+        _scaleWidth(context, 350.0, 825.0) * _contentScale(context);
 
     return Image.asset(
       'assets/images/abi_and_andy_title.png',
@@ -52,9 +59,8 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _detailsRow(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double scale = spacingScale(context);
-    double labelSize = (screenWidth > 975 ? 22.5 : 18.0) * _textScale(context);
+    double labelSize = _scaleWidth(context, 18.0, 22.5) * _textScale(context);
     double letterSpacing = 1.5;
 
     final textStyle = TextStyle(
@@ -107,8 +113,8 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _centerImage(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double imageWidth = (screenWidth > 975 ? 325.0 : 180.0) * _contentScale(context);
+    double imageWidth =
+        _scaleWidth(context, 180.0, 325.0) * _contentScale(context);
 
     return Image.asset(
       'assets/images/champagne_home.png',
@@ -118,31 +124,39 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _inviteLine(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double fontSize = (screenWidth > 975 ? 20.0 : 16.0) * _textScale(context);
+    double fontSize = _scaleWidth(context, 16.0, 20.0) * _textScale(context);
 
-    return Text(
-      'WE CAN\'T WAIT TO CELEBRATE WITH YOU',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontFamily: 'CoreBandiFace',
-        fontSize: fontSize,
-        color: creamColor,
-        letterSpacing: 1.2,
-        height: 1.6,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        'WE CAN\'T WAIT TO CELEBRATE WITH YOU',
+        maxLines: 1,
+        softWrap: false,
+        style: TextStyle(
+          fontFamily: 'CoreBandiFace',
+          fontSize: fontSize,
+          color: creamColor,
+          letterSpacing: 1.2,
+          height: 1.6,
+        ),
       ),
     );
   }
 
   Widget _countDown(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double countdownSize = (screenWidth > 975 ? 22.5 : 16.5) * _textScale(context);
+    double countdownSize =
+        _scaleWidth(context, 16.5, 22.5) * _textScale(context);
 
-    final dday = DateTime(2027, 3, 13);
-    final today = DateTime.now();
+    final dday = DateTime.utc(2027, 3, 13);
+    final now = DateTime.now();
+    final today = DateTime.utc(now.year, now.month, now.day);
     final difference = dday.difference(today).inDays;
 
-    var ddayText = difference > 0 ? '$difference DAYS TO GO!' : '';
+    var ddayText = difference > 0
+        ? '$difference DAYS TO GO!'
+        : difference == 0
+            ? "IT'S TODAY!"
+            : '';
 
     if (ddayText.isEmpty) return const SizedBox.shrink();
 
@@ -160,9 +174,8 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _rsvp(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double textScale = _textScale(context);
-    double rsvpTextSize = (screenWidth > 975 ? 25.0 : 24.0) * textScale;
+    double rsvpTextSize = _scaleWidth(context, 24.0, 25.0) * textScale;
 
     return ElevatedButton(
       onPressed: () {
@@ -193,8 +206,7 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _rsvpNote(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double fontSize = (screenWidth > 975 ? 18.0 : 14.0) * _textScale(context);
+    double fontSize = _scaleWidth(context, 14.0, 18.0) * _textScale(context);
 
     return Text(
       "Kindly RSVP by December 13",
@@ -209,11 +221,10 @@ class Introduction extends StatelessWidget {
   }
 
   Widget _invitation(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double scale = spacingScale(context);
-    double horizontalPadding = screenWidth > 975 ? 75 : 24;
+    double horizontalPadding = _scaleWidth(context, 24.0, 75.0);
     double wideWidth =
-        (screenWidth > 975 ? 1250 : 500) * _contentScale(context);
+        _scaleWidth(context, 500.0, 1250.0) * _contentScale(context);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),

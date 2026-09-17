@@ -1,18 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wedding_website/widgets/breakpoints.dart';
 
 class OverseasGuests extends StatelessWidget {
   const OverseasGuests({super.key});
 
   static const Color backgroundColor = Color(0xFF687351);
   static const Color creamColor = Color(0xFFF3F0E7);
-
-  bool isDesktopWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600;
-
-  bool isMobileWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
 
   Widget _title(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -204,7 +199,7 @@ class OverseasGuests extends StatelessWidget {
           "While you're in town, here are some of our favourite spots in Sydney! If you’d like more local tips and recommendations, please feel free to reach out to us directly. ",
           fontSize,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         _paragraph(
           "Eat & Drink",
           fontSize,
@@ -256,7 +251,7 @@ class OverseasGuests extends StatelessWidget {
               'Sydney Fish Market':
                   'https://www.google.com/maps/search/?api=1&query=Sydney+Fish+Market&query_place_id=ChIJqy_-dTGuEmsRtBGe8eEFI8E',
             }),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         _paragraph(
           "See & Do",
           fontSize,

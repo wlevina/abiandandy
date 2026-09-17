@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wedding_website/widgets/breakpoints.dart';
 import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
@@ -11,12 +12,6 @@ class Ceremony extends StatelessWidget {
 
   static const String googleMapsUrl =
       'https://maps.app.goo.gl/aSrjmY8d2umRF9Az6';
-
-  bool isDesktopWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600;
-
-  bool isMobileWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
 
   Future<void> _launchMaps() async {
     final uri = Uri.parse(googleMapsUrl);

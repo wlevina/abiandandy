@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
+import 'package:wedding_website/widgets/breakpoints.dart';
 import 'package:wedding_website/widgets/sign_off.dart';
 
 class WeddingAgenda extends StatelessWidget {
   const WeddingAgenda({super.key});
 
   static const Color creamColor = Color(0xFFF3F0E7);
-
-  bool isDesktopWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600;
-  bool isMobileWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
 
   double screenWidth(BuildContext context) => MediaQuery.of(context).size.width;
   double screenHeight(BuildContext context) =>

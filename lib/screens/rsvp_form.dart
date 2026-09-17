@@ -5,6 +5,7 @@ import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/home.dart';
 import 'package:wedding_website/model/guests.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
+import 'package:wedding_website/widgets/breakpoints.dart';
 
 class _PartyMember {
   final String name;
@@ -139,12 +140,6 @@ class RsvpFormState extends State<RsvpForm> {
       _setParty(guests);
     });
   }
-
-  bool isDesktopWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 600;
-
-  bool isMobileWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width < 600;
 
   double screenWidth(BuildContext context) => MediaQuery.of(context).size.width;
   double fieldTextSize(BuildContext context) =>
