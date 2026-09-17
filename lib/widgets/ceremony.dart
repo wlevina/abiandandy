@@ -15,7 +15,11 @@ class Ceremony extends StatelessWidget {
 
   Future<void> _launchMaps() async {
     final uri = Uri.parse(googleMapsUrl);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+      webOnlyWindowName: isMobileBrowser ? '_self' : null,
+    );
   }
 
   Widget _ceremony(BuildContext context) {

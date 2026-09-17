@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 
 // Every screen used to switch its layout structure (row vs. column, drawer
@@ -12,3 +14,12 @@ bool isMobileWidth(BuildContext context) =>
 
 bool isDesktopWidth(BuildContext context) =>
     MediaQuery.of(context).size.width >= mobileBreakpoint;
+
+// True when running in a mobile browser (as opposed to a desktop browser or
+// a narrow desktop window). Flutter web infers this from the user agent, so
+// unlike isMobileWidth it doesn't need a BuildContext and isn't affected by
+// window resizing.
+bool get isMobileBrowser =>
+    kIsWeb &&
+    (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android);

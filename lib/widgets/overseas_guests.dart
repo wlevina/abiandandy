@@ -63,8 +63,11 @@ class OverseasGuests extends StatelessWidget {
           text: match.value,
           style: const TextStyle(decoration: TextDecoration.underline),
           recognizer: TapGestureRecognizer()
-            ..onTap = () => launchUrl(Uri.parse(linkUrl),
-                mode: LaunchMode.externalApplication),
+            ..onTap = () => launchUrl(
+                  Uri.parse(linkUrl),
+                  mode: LaunchMode.externalApplication,
+                  webOnlyWindowName: isMobileBrowser ? '_self' : null,
+                ),
         ));
         cursor = match.key + match.value.length;
       }
@@ -122,7 +125,7 @@ class OverseasGuests extends StatelessWidget {
     required List<Widget> content,
   }) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double headingSize = screenWidth > 975 ? 45.0 : 36.0;
+    double headingSize = screenWidth > 975 ? 30.0 : 24.0;
     double iconHeight = screenWidth > 975 ? 110.0 : 50.0;
 
     return Column(
@@ -140,7 +143,7 @@ class OverseasGuests extends StatelessWidget {
           child: Text(
             heading,
             style: TextStyle(
-              fontFamily: 'Madelyn',
+              fontFamily: 'CoreBandiFace',
               fontSize: headingSize,
               color: creamColor,
             ),
@@ -302,7 +305,7 @@ class OverseasGuests extends StatelessWidget {
     final gettingAround = _infoColumn(
       context,
       iconAsset: 'assets/images/icon_swans.png',
-      heading: 'Getting around',
+      heading: 'Getting Around',
       content: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -340,7 +343,7 @@ class OverseasGuests extends StatelessWidget {
     final thingsToDo = _infoColumn(
       context,
       iconAsset: 'assets/images/icon_cocktail.png',
-      heading: 'Things to do',
+      heading: 'Things To Do',
       content: [_thingsToDoContent(fontSize)],
     );
 
