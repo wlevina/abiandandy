@@ -51,12 +51,15 @@ class MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(color: backgroundColor),
         leading: const AppMenuButton(),
         leadingWidth: 90,
-        title: const Text(
-          "A & A",
-          style: TextStyle(
-            color: backgroundColor,
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
+        title: GestureDetector(
+          onTap: scrollToTop,
+          child: const Text(
+            "A & A",
+            style: TextStyle(
+              color: backgroundColor,
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

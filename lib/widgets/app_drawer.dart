@@ -34,6 +34,13 @@ Route<T> fadeSlideRoute<T>(Widget page) {
   );
 }
 
+// Pops back to Home and scrolls it to the top, no matter where navigation
+// started from.
+void goHome(BuildContext context) {
+  Navigator.popUntil(context, (route) => route.isFirst);
+  homeKey.currentState?.scrollToTop();
+}
+
 // Closes the drawer, then either returns to Home (scrolling it back to the
 // top) or swaps the stack for the chosen page, so the back stack never grows
 // past [Home, currentPage] no matter where navigation started from.
@@ -41,8 +48,7 @@ void navigateFromDrawer(BuildContext context, int index) {
   Navigator.pop(context);
 
   if (index == 0) {
-    Navigator.popUntil(context, (route) => route.isFirst);
-    homeKey.currentState?.scrollToTop();
+    goHome(context);
     return;
   }
 
@@ -116,12 +122,15 @@ class WeddingAppBar extends StatelessWidget implements PreferredSizeWidget {
       iconTheme: const IconThemeData(color: backgroundColor),
       leading: const AppMenuButton(),
       leadingWidth: 90,
-      title: const Text(
-        "A & A",
-        style: TextStyle(
-          color: backgroundColor,
-          fontSize: 25,
-          fontWeight: FontWeight.bold,
+      title: GestureDetector(
+        onTap: () => goHome(context),
+        child: const Text(
+          "A & A",
+          style: TextStyle(
+            color: backgroundColor,
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
