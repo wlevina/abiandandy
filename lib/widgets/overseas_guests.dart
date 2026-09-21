@@ -210,13 +210,12 @@ class OverseasGuests extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         _bullet(
-            'Enjoy harbour views over a drink at Opera Bar or The Oriana',
+            'Enjoy harbour views over a drink at Opera Bar or Cruise Bar',
             fontSize,
             links: {
               'Opera Bar':
                   'https://www.google.com/maps/search/?api=1&query=Opera+Bar+Sydney&query_place_id=ChIJB5NuYGauEmsROhQEpJXe5qo',
-              'The Oriana':
-                  'https://www.google.com/maps/search/?api=1&query=Squires+Landing+Sydney&query_place_id=ChIJDcRr3A6vEmsRN3dKYsaQawI',
+              'Cruise Bar': 'https://maps.app.goo.gl/fPa8oSY2Hr63Grjd7',
             }),
         _bullet('Pick up a banh mi at Marrickville Pork Roll — Darling Square',
             fontSize,
@@ -242,7 +241,9 @@ class OverseasGuests extends StatelessWidget {
           'Gelato Messina':
               'https://www.google.com/maps/search/?api=1&query=Gelato+Messina+Circular+Quay&query_place_id=ChIJlyAUd0KuEmsRUUgk0FiWG14',
         }),
-        _bullet('Sip on cocktails at PS40 or Maybe Sammy', fontSize, links: {
+        _bullet('Sip on cocktails at Untied, PS40 or Maybe Sammy', fontSize,
+            links: {
+              'Untied': 'https://maps.app.goo.gl/QqKtCSAgNF4PMrjq5',
           'PS40':
               'https://www.google.com/maps/search/?api=1&query=PS40+Sydney&query_place_id=ChIJqcU0ST-uEmsRClU9RTRiAk4',
           'Maybe Sammy': 'https://maps.app.goo.gl/e5wXquuB5oK38suV8',
