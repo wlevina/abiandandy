@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/screens/rsvp_form.dart';
 import 'package:wedding_website/widgets/app_drawer.dart';
 import 'package:wedding_website/widgets/breakpoints.dart';
@@ -179,7 +178,6 @@ class Introduction extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: () {
-        RsvpSheetsApi.warmUp();
         Navigator.push(context, fadeSlideRoute(const RsvpForm()));
       },
       style: ElevatedButton.styleFrom(

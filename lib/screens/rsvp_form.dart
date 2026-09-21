@@ -43,20 +43,20 @@ class RsvpFormState extends State<RsvpForm> {
   Guest? primaryGuest;
   List<_PartyMember> _party = [];
 
-  // The (normalized) name Confirm has already resolved and shown for
-  // review. Lets the first Confirm reveal the party fields without
-  // immediately flagging them as unanswered — a second Confirm submits.
+  // The (normalized) name Submit has already resolved and shown for
+  // review. Lets the first Submit reveal the party fields without
+  // immediately flagging them as unanswered — a second Submit submits.
   String? _resolvedForName;
 
   int _validationRequestId = 0;
 
-  // True once the user has tapped Confirm on the (revealed) party list —
+  // True once the user has tapped Submit on the (revealed) party list —
   // only then do unanswered party members get their "Not answered yet"
   // status highlighted, so collapsed cards don't look like errors on
   // first load.
   bool _submitAttempted = false;
 
-  // Guards against a second Confirm tap firing while one is already in
+  // Guards against a second Submit tap firing while one is already in
   // flight — without this, an impatient double-tap starts a second lookup
   // that races the first: the first call's own (now-stale) response still
   // resumes its _handleSubmit, sees the not-yet-updated primaryGuest as
@@ -142,12 +142,11 @@ class RsvpFormState extends State<RsvpForm> {
   }
 
   double screenWidth(BuildContext context) => MediaQuery.of(context).size.width;
-  double fieldTextSize(BuildContext context) =>
-      screenWidth(context) > 975 ? 18.0 : 18.0;
-  double responseTextSize(BuildContext context) =>
-      screenWidth(context) > 975 ? 18.0 : 18.0;
+  double fieldTextSize(BuildContext context) => 18.0;
   double buttonTextSize(BuildContext context) =>
-      screenWidth(context) > 975 ? 25.0 : 21.0;
+      screenWidth(context) > 975 ? 22.0 : 19.0;
+  double buttonSpacing(BuildContext context) =>
+      screenWidth(context) > 975 ? 40.0 : 18.0;
 
   InputDecoration _underlineDecoration(
       {String? hintText, bool filled = false, Color? fillColor}) {
@@ -163,8 +162,8 @@ class RsvpFormState extends State<RsvpForm> {
       focusedErrorBorder:
           const UnderlineInputBorder(borderSide: BorderSide(color: errorColor)),
       hintText: hintText,
-      hintStyle: TextStyle(
-          fontSize: 15.0, color: creamColor.withValues(alpha: 0.6)),
+      hintStyle:
+          TextStyle(fontSize: 15.0, color: creamColor.withValues(alpha: 0.6)),
       errorStyle: const TextStyle(color: errorColor),
     );
   }
@@ -195,50 +194,48 @@ class RsvpFormState extends State<RsvpForm> {
   }
 
   Widget _name(BuildContext context) {
-    double nameHintSize = screenWidth(context) > 975 ? 18.0 : 18.0;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-        width: 280,
-        child: TextFormField(
-          key: nameFieldKey,
-          style: TextStyle(
-              fontSize: responseTextSize(context), color: creamColor),
-          controller: controllerName,
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => _handleSubmit(context),
-          decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: creamColor.withValues(alpha: 0.8))),
-            focusedBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: creamColor.withValues(alpha: 0.8))),
-            errorBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: errorColor)),
-            focusedErrorBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: errorColor)),
-            hintStyle: TextStyle(
-                fontSize: nameHintSize,
-                color: creamColor.withValues(alpha: 0.6)),
-            hintText: "Your first and last name",
-            errorStyle: const TextStyle(color: errorColor),
+          width: 280,
+          child: TextFormField(
+            key: nameFieldKey,
+            style:
+                TextStyle(fontSize: fieldTextSize(context), color: creamColor),
+            controller: controllerName,
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => _handleSubmit(context),
+            decoration: InputDecoration(
+              enabledBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: creamColor.withValues(alpha: 0.8))),
+              focusedBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: creamColor.withValues(alpha: 0.8))),
+              errorBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: errorColor)),
+              focusedErrorBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: errorColor)),
+              hintStyle: TextStyle(
+                  fontSize: fieldTextSize(context),
+                  color: creamColor.withValues(alpha: 0.6)),
+              hintText: "Your first and last name",
+              errorStyle: const TextStyle(color: errorColor),
+            ),
+            validator: (value) {
+              if (value != null && value.isEmpty) {
+                return "Please enter your name";
+              } else if (primaryGuest != null) {
+                return null;
+              } else if (value != null && !value.contains(" ")) {
+                return "Please enter your first and last name";
+              } else {
+                return "We can't seem to find your invite. \nPlease try another spelling or contact us directly.";
+              }
+            },
           ),
-          validator: (value) {
-            if (value != null && value.isEmpty) {
-              return "Please enter your name";
-            } else if (primaryGuest != null) {
-              return null;
-            } else if (value != null && !value.contains(" ")) {
-              return "Please enter your first and last name";
-            } else {
-              return "We can't seem to find your invite. \nPlease try another spelling or contact us directly.";
-            }
-          },
-        ),
         ),
       ],
     );
@@ -283,7 +280,8 @@ class RsvpFormState extends State<RsvpForm> {
     if (hasCeremony && hasReception) {
       return "Ceremony ${member.ceremony} · Reception ${member.reception}";
     }
-    if (hasCeremony) return "Ceremony ${member.ceremony} · Reception not answered";
+    if (hasCeremony)
+      return "Ceremony ${member.ceremony} · Reception not answered";
     return "Reception ${member.reception} · Ceremony not answered";
   }
 
@@ -331,7 +329,7 @@ class RsvpFormState extends State<RsvpForm> {
                     children: [
                       Text(member.name,
                           style: TextStyle(
-                              fontSize: responseTextSize(context),
+                              fontSize: fieldTextSize(context),
                               fontWeight: FontWeight.bold,
                               color: creamColor)),
                       const SizedBox(height: 2),
@@ -366,9 +364,17 @@ class RsvpFormState extends State<RsvpForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _partyCeremony(context, member, isSelf),
+                _partyAttendanceQuestion(context, member, isSelf,
+                    occasion: "ceremony",
+                    keySuffix: "ceremony",
+                    currentValue: member.ceremony,
+                    onValueChanged: (value) => member.ceremony = value),
                 const SizedBox(height: 16),
-                _partyReception(context, member, isSelf),
+                _partyAttendanceQuestion(context, member, isSelf,
+                    occasion: "reception",
+                    keySuffix: "reception",
+                    currentValue: member.reception,
+                    onValueChanged: (value) => member.reception = value),
                 const SizedBox(height: 16),
                 _partyDietary(context, member),
               ],
@@ -384,33 +390,42 @@ class RsvpFormState extends State<RsvpForm> {
     );
   }
 
-  Widget _partyCeremony(
-      BuildContext context, _PartyMember member, bool isSelf) {
+  // Shared by the ceremony and reception questions, which only differ in
+  // their wording and which _PartyMember field they read from/write to.
+  Widget _partyAttendanceQuestion(
+    BuildContext context,
+    _PartyMember member,
+    bool isSelf, {
+    required String occasion,
+    required String keySuffix,
+    required String currentValue,
+    required ValueChanged<String> onValueChanged,
+  }) {
     final value =
-        attendanceOptions.contains(member.ceremony) ? member.ceremony : null;
+        attendanceOptions.contains(currentValue) ? currentValue : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Will ${member.name} be attending our wedding ceremony?",
+        Text("Will ${member.name} be attending our wedding $occasion?",
             style: TextStyle(fontSize: fieldTextSize(context))),
         // Gives the popup menu room to open upward (it aligns the
         // selected item with the field) without overlapping the
         // question text above it.
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
-          key: ValueKey('${member.name}-ceremony'),
+          key: ValueKey('${member.name}-$keySuffix'),
           initialValue: value,
           // Form.reset() (Cancel) restores dropdowns to their initial
           // value by invoking this callback with null — a bare `!` would
           // throw and abort the whole reset before it clears `_party`.
-          onChanged: (value) => setState(() => member.ceremony = value ?? ''),
+          onChanged: (value) => setState(() => onValueChanged(value ?? '')),
           items: attendanceOptions
               .map((value) => DropdownMenuItem(
                     value: value,
                     child: Text(value,
                         style: TextStyle(
-                            fontSize: responseTextSize(context),
+                            fontSize: fieldTextSize(context),
                             color: backgroundColor)),
                   ))
               .toList(),
@@ -419,71 +434,17 @@ class RsvpFormState extends State<RsvpForm> {
                     alignment: Alignment.centerLeft,
                     child: Text(value,
                         style: TextStyle(
-                            fontSize: responseTextSize(context),
+                            fontSize: fieldTextSize(context),
                             color: creamColor)),
                   ))
               .toList(),
           decoration: _underlineDecoration(
-              filled: value != null,
-              fillColor: backgroundColor),
+              filled: value != null, fillColor: backgroundColor),
           icon: Icon(Icons.keyboard_arrow_down_rounded,
               color: creamColor.withValues(alpha: 0.8)),
           iconSize: 30,
           validator: (value) =>
-              isSelf && value == null
-              ? "Please select a response."
-              : null,
-        ),
-      ],
-    );
-  }
-
-  Widget _partyReception(
-      BuildContext context, _PartyMember member, bool isSelf) {
-    final value =
-        attendanceOptions.contains(member.reception) ? member.reception : null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Will ${member.name} be attending our wedding reception?",
-            style: TextStyle(fontSize: fieldTextSize(context))),
-        // Gives the popup menu room to open upward (it aligns the
-        // selected item with the field) without overlapping the
-        // question text above it.
-        const SizedBox(height: 10),
-        DropdownButtonFormField<String>(
-          key: ValueKey('${member.name}-reception'),
-          initialValue: value,
-          onChanged: (value) => setState(() => member.reception = value ?? ''),
-          items: attendanceOptions
-              .map((value) => DropdownMenuItem(
-                    value: value,
-                    child: Text(value,
-                        style: TextStyle(
-                            fontSize: responseTextSize(context),
-                            color: backgroundColor)),
-                  ))
-              .toList(),
-          selectedItemBuilder: (context) => attendanceOptions
-              .map((value) => Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(value,
-                        style: TextStyle(
-                            fontSize: responseTextSize(context),
-                            color: creamColor)),
-                  ))
-              .toList(),
-          decoration: _underlineDecoration(
-              filled: value != null,
-              fillColor: backgroundColor),
-          icon: Icon(Icons.keyboard_arrow_down_rounded,
-              color: creamColor.withValues(alpha: 0.8)),
-          iconSize: 30,
-          validator: (value) =>
-              isSelf && value == null
-              ? "Please select a response."
-              : null,
+              isSelf && value == null ? "Please select a response." : null,
         ),
       ],
     );
@@ -506,8 +467,65 @@ class RsvpFormState extends State<RsvpForm> {
     );
   }
 
+  // Prompts before submitting if any non-primary party member still has an
+  // unanswered ceremony/reception field (those fields aren't required by
+  // the form, so validate() alone wouldn't catch this). Returns true if the
+  // user chose to submit anyway, false/null if they backed out.
+  Future<bool?> _confirmUnansweredParty(
+      BuildContext context, List<_PartyMember> unanswered) {
+    final names = unanswered.map((m) => m.name).join(', ');
+    final isPlural = unanswered.length > 1;
+    final spaceBetweenButtons = buttonSpacing(context);
+
+    OutlinedButton dialogButton(String label, bool result) {
+      return OutlinedButton(
+        style: OutlinedButton.styleFrom(
+            side: BorderSide(color: backgroundColor.withValues(alpha: 0.8))),
+        onPressed: () => Navigator.pop(context, result),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: fieldTextSize(context),
+                fontWeight: FontWeight.bold,
+                color: backgroundColor)),
+      );
+    }
+
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        // Translucent cream, close to the app bar's (WeddingAppBar) but
+        // more opaque for legibility, rather than the fully-opaque
+        // creamColor used elsewhere on this page.
+        backgroundColor: const Color.fromRGBO(243, 240, 231, 0.9),
+        // Flat + deliberately-rounded, like the rest of the site (e.g. the
+        // drawer's selection indicator), instead of Material's default
+        // heavy drop shadow and near-square corners.
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        // Matches the 50px horizontal page margin used on other screens
+        // (e.g. the FAQ and Wedding Agenda pages).
+        insetPadding: const EdgeInsets.symmetric(horizontal: 50, vertical: 24),
+        contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 8),
+        content: Text(
+          "$names ${isPlural ? "haven't" : "hasn't"} responded yet. "
+          "Submit anyway?",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: backgroundColor, fontSize: fieldTextSize(context)),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.only(bottom: 20, top: 8),
+        actions: [
+          dialogButton("Go back", false),
+          SizedBox(width: spaceBetweenButtons),
+          dialogButton("Submit anyway", true),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleSubmit(BuildContext context) async {
-    // Ignore a second trigger (double-tap, or Confirm tapped right after
+    // Ignore a second trigger (double-tap, or Submit tapped right after
     // the keyboard's Done/onFieldSubmitted already fired) while the first
     // is still in flight — otherwise the two calls race and the first
     // one's now-stale "not found" fallback can flash before the second's
@@ -537,7 +555,7 @@ class RsvpFormState extends State<RsvpForm> {
         if (primaryGuest != null) {
           // Found the invite — show it for review instead of immediately
           // flagging required fields nobody's had a chance to answer yet.
-          // A second Confirm (below) actually submits.
+          // A second Submit (below) actually submits.
           _resolvedForName = typedName;
           _submitAttempted = false;
           // Clear a stale "can't find invite" error left over from an
@@ -554,6 +572,20 @@ class RsvpFormState extends State<RsvpForm> {
       final isValid = form.validate();
 
       if (!isValid) return;
+
+      final unansweredOthers = _party.where((member) {
+        final isSelf =
+            primaryGuest != null && member.name == primaryGuest!.name;
+        return !isSelf && (member.ceremony.isEmpty || member.reception.isEmpty);
+      }).toList();
+
+      if (unansweredOthers.isNotEmpty) {
+        if (!context.mounted) return;
+        final proceed =
+            await _confirmUnansweredParty(context, unansweredOthers);
+        if (!mounted || proceed != true) return;
+        if (!context.mounted) return;
+      }
 
       final submittedParty = List<_PartyMember>.from(_party);
 
@@ -578,7 +610,7 @@ class RsvpFormState extends State<RsvpForm> {
           context: context,
           builder: (BuildContext context) {
             return Container(
-              color: creamColor,
+              color: creamColor.withValues(alpha: 0.95),
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
@@ -643,7 +675,7 @@ class RsvpFormState extends State<RsvpForm> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Keeps "Confirm" laid out (just invisible) while loading, so the
+          // Keeps "Submit" laid out (just invisible) while loading, so the
           // button reserves the same footprint instead of shrinking to fit
           // the smaller spinner.
           Visibility(
@@ -651,7 +683,7 @@ class RsvpFormState extends State<RsvpForm> {
             maintainSize: true,
             maintainAnimation: true,
             maintainState: true,
-            child: Text("Confirm",
+            child: Text("Submit",
                 style: TextStyle(
                     fontSize: buttonTextSize(context),
                     fontWeight: FontWeight.normal,
@@ -709,7 +741,7 @@ class RsvpFormState extends State<RsvpForm> {
   // Cross-fades + grows between the bare name field and the resolved
   // party list, instead of the two swapping instantly the moment
   // validateName() resolves — that abrupt layout jump is what reads as
-  // "sudden" when the Confirm spinner finishes.
+  // "sudden" when the Submit spinner finishes.
   Widget _formContent(BuildContext context, {required double nameSpacing}) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
@@ -741,7 +773,7 @@ class RsvpFormState extends State<RsvpForm> {
   }
 
   Widget _buttonRow(BuildContext context) {
-    double spaceBetweenButtons = screenWidth(context) > 975 ? 40.0 : 18.0;
+    double spaceBetweenButtons = buttonSpacing(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -755,11 +787,11 @@ class RsvpFormState extends State<RsvpForm> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    bool isDesktop = Theme.of(context).platform == TargetPlatform.windows ||
-        Theme.of(context).platform == TargetPlatform.linux ||
-        Theme.of(context).platform == TargetPlatform.macOS;
 
-    if (isDesktop && isMobileWidth(context) || (isMobileWidth(context))) {
+    // (isDesktop && isMobileWidth(context)) || isMobileWidth(context)
+    // reduces to just isMobileWidth(context) — the isDesktop platform
+    // check never changed the outcome.
+    if (isMobileWidth(context)) {
       return Scaffold(
           appBar: const WeddingAppBar(),
           drawer: const AppDrawer(selectedIndex: 1),

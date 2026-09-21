@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wedding_website/api/sheets/rsvp_sheets_api.dart';
 import 'package:wedding_website/home.dart';
 import 'package:wedding_website/screens/faq.dart';
 import 'package:wedding_website/screens/overseas_guests.dart';
@@ -51,8 +50,6 @@ void navigateFromDrawer(BuildContext context, int index) {
     goHome(context);
     return;
   }
-
-  if (index == 1) RsvpSheetsApi.warmUp();
 
   final Widget page = switch (index) {
     1 => const RsvpForm(),

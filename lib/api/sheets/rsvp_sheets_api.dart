@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -8,14 +7,6 @@ import 'package:wedding_website/model/guests.dart';
 class RsvpSheetsApi {
   static const _endpoint = String.fromEnvironment('RSVP_API_URL');
   static const _token = String.fromEnvironment('RSVP_API_TOKEN');
-
-  // Fire-and-forget request that exercises the same lookup path (spreadsheet
-  // open + full read) without matching anything, so Apps Script's container
-  // is already warm by the time the user finishes typing and taps Confirm.
-  // Call this as soon as they tap into the RSVP flow, not on every keystroke.
-  static void warmUp() {
-    unawaited(_post({'action': 'lookup', 'name': ''}));
-  }
 
   static Future<(Guest?, List<Guest>)> getGuestAndParty(String name) async {
     final response = await _post({'action': 'lookup', 'name': name});
@@ -28,9 +19,9 @@ class RsvpSheetsApi {
     return (Guest.fromJson(guestJson), party);
   }
 
-  // Submits every party member's update in one request, so the Apps Script
-  // backend only spins up (and reads/writes the sheet) once per RSVP
-  // submission instead of once per party member.
+  // Submits every party member's update in one request, so the backend
+  // only reads/writes the sheet once per RSVP submission instead of once
+  // per party member.
   static Future<bool> updateParty(
     Map<String, Map<String, dynamic>> guestDetailsByName,
   ) async {
@@ -48,9 +39,9 @@ class RsvpSheetsApi {
     Map<String, dynamic> body,
   ) async {
     try {
-      // text/plain avoids a CORS preflight (OPTIONS), which Apps Script
-      // Web Apps don't implement — the JSON body is unaffected since
-      // Code.gs parses e.postData.contents regardless of content type.
+      // text/plain is CORS-safelisted, so this never triggers a preflight
+      // OPTIONS request — the backend parses the JSON body regardless of
+      // declared content type, so this is free either way.
       final response = await http.post(
         Uri.parse(_endpoint),
         headers: {'Content-Type': 'text/plain;charset=utf-8'},

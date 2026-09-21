@@ -1,0 +1,12 @@
+name = "abiandandy-rsvp"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+SPREADSHEET_ID = "13z_3zY4CCziXTkT9mbS6aDq-19izSD6uqzVFpUM5Roo"
+SHEET_NAME = "Guests"
+
+# Secrets (not stored here — set with `wrangler secret put <NAME>`):
+#   API_TOKEN                 shared secret the Flutter app sends with every request
+#   GCP_SERVICE_ACCOUNT_KEY_JSON   full JSON key file for the service account with
+#                                  Editor access to the "Guests" sheet
