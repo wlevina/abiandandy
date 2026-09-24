@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wedding_website/widgets/breakpoints.dart';
+import 'package:wedding_website/widgets/precached_fade_in.dart';
 
 class OverseasGuests extends StatelessWidget {
   const OverseasGuests({super.key});
@@ -91,7 +92,7 @@ class OverseasGuests extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: SelectableText.rich(
+            child: Text.rich(
               TextSpan(children: spans, style: baseStyle),
             ),
           ),
@@ -104,7 +105,7 @@ class OverseasGuests extends StatelessWidget {
       {TextAlign? align, bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: SelectableText(
+      child: Text(
         text,
         textAlign: align ?? TextAlign.left,
         style: TextStyle(
@@ -380,16 +381,25 @@ class OverseasGuests extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding)
           .copyWith(bottom: 60),
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Matches the top spacing used above the title on the RSVP,
-            // Agenda, and FAQ pages, so the title sits the same distance
-            // from the top of the screen across pages.
-            SizedBox(height: screenHeight * 0.1),
-            _title(context),
-            const SizedBox(height: 50),
-            _content(context),
-          ],
+        child: SelectionArea(
+          child: Column(
+            children: [
+              // Matches the top spacing used above the title on the RSVP,
+              // Agenda, and FAQ pages, so the title sits the same distance
+              // from the top of the screen across pages.
+              SizedBox(height: screenHeight * 0.1),
+              _title(context),
+              const SizedBox(height: 50),
+              PrecachedFadeIn(
+                imagePaths: const [
+                  'assets/images/icon_swans.png',
+                  'assets/images/icon_house.png',
+                  'assets/images/icon_cocktail.png',
+                ],
+                child: _content(context),
+              ),
+            ],
+          ),
         ),
       ),
     );

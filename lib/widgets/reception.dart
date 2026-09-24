@@ -47,52 +47,63 @@ class Reception extends StatelessWidget {
         ),
         SizedBox(height: gapSize),
       
-        SelectableText(
-          'Events by Alpha',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: venueTextSize,
-            color: creamColor,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        SelectableText(
-          'The Grand, 238 Castlereagh St, Sydney NSW',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: addressTextSize,
-            color: creamColor,
+        SelectionArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Events by Alpha',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'CoreBandiFace',
+                  fontSize: venueTextSize,
+                  color: creamColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'The Grand, 238 Castlereagh St, Sydney NSW',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'CoreBandiFace',
+                  fontSize: addressTextSize,
+                  color: creamColor,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 10),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: _launchMaps,
-            child: Text(
-              'View on Google maps',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'CoreBandiFace',
-                fontSize: linkTextSize,
-                color: creamColor,
-                decoration: TextDecoration.underline,
+        SelectionContainer.disabled(
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: _launchMaps,
+              child: Text(
+                'View on Google maps',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'CoreBandiFace',
+                  fontSize: linkTextSize,
+                  color: creamColor,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ),
         ),
         SizedBox(height: gapSize),
-        SelectableText(
-          'Cocktails from 5:30pm followed by dinner and dancing. After-party until late!',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: detailsTextSize,
-            color: creamColor,
-            letterSpacing: 0.5,
+        SelectionArea(
+          child: Text(
+            'Cocktails from 5:30pm followed by dinner and dancing. After-party until late!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'CoreBandiFace',
+              fontSize: detailsTextSize,
+              color: creamColor,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
         SizedBox(height: gapSize),

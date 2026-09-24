@@ -283,7 +283,7 @@ class _PasswordGateState extends State<PasswordGate>
             padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 24),
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(child: content),
+              child: Align(alignment: const Alignment(0, -0.3), child: content),
             ),
           ),
         ),

@@ -51,52 +51,63 @@ class Ceremony extends StatelessWidget {
         ),
         SizedBox(height: gapSize),
 
-        SelectableText(
-          'The Mint',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: venueTextSize,
-            color: creamColor,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        SelectableText(
-          '10 Macquarie Street, Sydney NSW',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: addressTextSize,
-            color: creamColor,
+        SelectionArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'The Mint',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'CoreBandiFace',
+                  fontSize: venueTextSize,
+                  color: creamColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '10 Macquarie Street, Sydney NSW',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'CoreBandiFace',
+                  fontSize: addressTextSize,
+                  color: creamColor,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 10),
-        MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: _launchMaps,
-            child: Text(
-              'View on Google maps',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'CoreBandiFace',
-                fontSize: linkTextSize,
-                color: creamColor,
-                decoration: TextDecoration.underline,
+        SelectionContainer.disabled(
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: _launchMaps,
+              child: Text(
+                'View on Google maps',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'CoreBandiFace',
+                  fontSize: linkTextSize,
+                  color: creamColor,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ),
         ),
         SizedBox(height: gapSize),
-        SelectableText(
-          'Please arrive by 12:00pm for a 12:30pm start',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'CoreBandiFace',
-            fontSize: detailsTextSize,
-            color: creamColor,
-            letterSpacing: 0.5,
+        SelectionArea(
+          child: Text(
+            'Please arrive by 12:00pm for a 12:30pm start',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'CoreBandiFace',
+              fontSize: detailsTextSize,
+              color: creamColor,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
         SizedBox(height: gapSize),
