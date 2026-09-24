@@ -31,7 +31,8 @@ jobs:
       - run: |
           flutter build web --release --base-href / \
             --dart-define=RSVP_API_URL=${{ secrets.RSVP_API_URL }} \
-            --dart-define=RSVP_API_TOKEN=${{ secrets.RSVP_API_TOKEN }}
+            --dart-define=RSVP_API_TOKEN=${{ secrets.RSVP_API_TOKEN }} \
+            --dart-define=SITE_PASSWORD=${{ secrets.SITE_PASSWORD }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

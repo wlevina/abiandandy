@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'screens/password_gate.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         primaryColor:  const Color(0xFFF3F0E7),
         useMaterial3: false,
       ),
-      home: MyHomePage(key: homeKey),
+      home: PasswordGate(child: MyHomePage(key: homeKey)),
       debugShowCheckedModeBanner: false,
     );
   }

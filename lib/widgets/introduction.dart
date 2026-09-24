@@ -5,17 +5,41 @@ import 'package:wedding_website/widgets/breakpoints.dart';
 import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
-class Introduction extends StatelessWidget {
+class Introduction extends StatefulWidget {
   const Introduction({super.key});
 
+  @override
+  State<Introduction> createState() => _IntroductionState();
+}
+
+class _IntroductionState extends State<Introduction>
+    with SingleTickerProviderStateMixin {
   static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
   static const Color creamColor = Color(0xFFF3F0E7);
+
+  // Plays once on mount so the hero settles in instead of snapping in place.
+  late final AnimationController _entranceController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..forward();
+  // easeIn so opacity climbs for the whole duration rather than popping early;
+  // the slide keeps easeOut, the natural curve for settling into place.
+  late final Animation<double> _entranceOpacity =
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeIn);
+  late final Animation<double> _entranceSlide =
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOut);
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
 
   // Width where hand-tuned phone values (e.g. 350 title, 180 image) apply exactly; below it, sizing stays flat.
   static const double _phoneReferenceWidth = 390;
 
-  // Interpolates linearly between the phone value (at 390px) and the desktop value (at mobileBreakpoint),
-  // so a tablet at e.g. 768px scales smoothly instead of inheriting the undersized phone hero.
+  // Ramps from phoneValue to desktopValue as width grows from 390px to mobileBreakpoint,
+  // so tablet widths get an in-between size instead of jumping straight from one to the other.
   double _scaleWidth(
       BuildContext context, double phoneValue, double desktopValue) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -46,6 +70,10 @@ class Introduction extends StatelessWidget {
     return SquiggleDivider(width: width, height: 14, color: creamColor);
   }
 
+  // Real asset is 4269x2194 — explicit height reserves the right box before
+  // decode, so layout doesn't jump once the image loads.
+  static const double _titleAspectRatio = 4269 / 2194;
+
   Widget _title(BuildContext context) {
     double titleWidth =
         _scaleWidth(context, 350.0, 825.0) * _contentScale(context);
@@ -53,6 +81,7 @@ class Introduction extends StatelessWidget {
     return Image.asset(
       'assets/images/abi_and_andy_title.png',
       width: titleWidth,
+      height: titleWidth / _titleAspectRatio,
       fit: BoxFit.contain,
     );
   }
@@ -111,6 +140,9 @@ class Introduction extends StatelessWidget {
     );
   }
 
+  // Real asset is 769x800 — see _titleAspectRatio for why this is explicit.
+  static const double _champagneAspectRatio = 769 / 800;
+
   Widget _centerImage(BuildContext context) {
     double imageWidth =
         _scaleWidth(context, 180.0, 325.0) * _contentScale(context);
@@ -118,6 +150,7 @@ class Introduction extends StatelessWidget {
     return Image.asset(
       'assets/images/champagne_home.png',
       width: imageWidth,
+      height: imageWidth / _champagneAspectRatio,
       fit: BoxFit.contain,
     );
   }
@@ -268,6 +301,21 @@ class Introduction extends StatelessWidget {
       ],
     );
 
+    // ClipRect because SlideTransition doesn't clip — without it the offset
+    // start position bleeds into the section below for the first frames.
+    Widget animatedContent = ClipRect(
+      child: FadeTransition(
+        opacity: _entranceOpacity,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.06),
+            end: Offset.zero,
+          ).animate(_entranceSlide),
+          child: content,
+        ),
+      ),
+    );
+
     return Container(
       width: screenWidth,
       color: backgroundColor,
@@ -280,8 +328,8 @@ class Introduction extends StatelessWidget {
       constraints:
           mobile ? BoxConstraints(minHeight: screenHeight) : const BoxConstraints(),
       child: mobile
-          ? Align(alignment: Alignment.bottomCenter, child: content)
-          : content,
+          ? Align(alignment: Alignment.bottomCenter, child: animatedContent)
+          : animatedContent,
     );
   }
 }
