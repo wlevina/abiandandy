@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wedding_website/widgets/precached_fade_in.dart';
 
 class Photobooth extends StatelessWidget {
   const Photobooth({super.key});
@@ -18,9 +19,12 @@ class Photobooth extends StatelessWidget {
         alignment: Alignment.center,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: gifMaxWidth),
-          child: Image.asset(
-            'assets/images/photobooth.gif',
-            fit: BoxFit.contain,
+          child: PrecachedFadeIn(
+            imagePaths: const ['assets/images/photobooth.gif'],
+            child: Image.asset(
+              'assets/images/photobooth.gif',
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),

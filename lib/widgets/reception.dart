@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wedding_website/widgets/breakpoints.dart';
+import 'package:wedding_website/widgets/precached_fade_in.dart';
 import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
@@ -116,13 +117,21 @@ class Reception extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                'assets/images/alpha_events.png',
+              PrecachedFadeIn(
+                imagePaths: const ['assets/images/alpha_events.png'],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/alpha_events.png',
+                    ),
+                    Container(
+                        padding: const EdgeInsets.all(2.0),
+                        width: screenWidth * 0.8,
+                        child: _reception(context)),
+                  ],
+                ),
               ),
-              Container(
-                  padding: const EdgeInsets.all(2.0),
-                  width: screenWidth * 0.8,
-                  child: _reception(context)),
               SizedBox(height: 230 * spacingScale(context)),
               SquiggleDivider(
                 width: screenWidth - dividerSize * 2,
@@ -142,26 +151,29 @@ class Reception extends StatelessWidget {
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1800),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: SizedBox(
-                          width: screenWidth,
-                          height: heroHeight,
-                          child: Image.asset(
-                            'assets/images/alpha_events.png',
-                          ))),
-                  if (isDesktopWidth(context))
+              child: PrecachedFadeIn(
+                imagePaths: const ['assets/images/alpha_events.png'],
+                child: Row(
+                  children: [
                     Expanded(
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 550),
-                                child: Padding(
-                                    padding: const EdgeInsets.all(40.0),
-                                    child: _reception(context))))),
-                ],
+                        child: SizedBox(
+                            width: screenWidth,
+                            height: heroHeight,
+                            child: Image.asset(
+                              'assets/images/alpha_events.png',
+                            ))),
+                    if (isDesktopWidth(context))
+                      Expanded(
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 550),
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(40.0),
+                                      child: _reception(context))))),
+                  ],
+                ),
               ),
             ),
           ),

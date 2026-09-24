@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wedding_website/widgets/breakpoints.dart';
+import 'package:wedding_website/widgets/precached_fade_in.dart';
 import 'package:wedding_website/widgets/spacing.dart';
 import 'package:wedding_website/widgets/squiggle_painter.dart';
 
@@ -121,13 +122,21 @@ class Ceremony extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                'assets/images/the_mint.png',
+              PrecachedFadeIn(
+                imagePaths: const ['assets/images/the_mint.png'],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/the_mint.png',
+                    ),
+                    Container(
+                        padding: const EdgeInsets.all(2.0),
+                        width: screenWidth * 0.8,
+                        child: _ceremony(context)),
+                  ],
+                ),
               ),
-              Container(
-                  padding: const EdgeInsets.all(2.0),
-                  width: screenWidth * 0.8,
-                  child: _ceremony(context)),
               SizedBox(height: 220 * spacingScale(context)),
               SquiggleDivider(
                 width: screenWidth - dividerSize * 2,
@@ -148,26 +157,29 @@ class Ceremony extends StatelessWidget {
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1800),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: SizedBox(
-                          width: screenWidth,
-                          height: heroHeight,
-                          child: Image.asset(
-                            'assets/images/the_mint.png',
-                          ))),
-                  if (isDesktopWidth(context))
+              child: PrecachedFadeIn(
+                imagePaths: const ['assets/images/the_mint.png'],
+                child: Row(
+                  children: [
                     Expanded(
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 550),
-                                child: Padding(
-                                    padding: const EdgeInsets.all(40.0),
-                                    child: _ceremony(context))))),
-                ],
+                        child: SizedBox(
+                            width: screenWidth,
+                            height: heroHeight,
+                            child: Image.asset(
+                              'assets/images/the_mint.png',
+                            ))),
+                    if (isDesktopWidth(context))
+                      Expanded(
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 550),
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(40.0),
+                                      child: _ceremony(context))))),
+                  ],
+                ),
               ),
             ),
           ),

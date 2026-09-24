@@ -17,17 +17,39 @@ class _IntroductionState extends State<Introduction>
   static const Color backgroundColor = Color.fromRGBO(104, 115, 81, 1);
   static const Color creamColor = Color(0xFFF3F0E7);
 
-  // Plays once on mount so the hero settles in instead of snapping in place.
+  // Starts once both hero images are precached (see didChangeDependencies)
+  // so the images and text settle in together, instead of the images
+  // sometimes popping in a beat after the animation has already finished.
   late final AnimationController _entranceController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
-  )..forward();
+  );
   // easeIn so opacity climbs for the whole duration rather than popping early;
   // the slide keeps easeOut, the natural curve for settling into place.
   late final Animation<double> _entranceOpacity =
       CurvedAnimation(parent: _entranceController, curve: Curves.easeIn);
   late final Animation<double> _entranceSlide =
       CurvedAnimation(parent: _entranceController, curve: Curves.easeOut);
+
+  bool _precacheRequested = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // precacheImage needs the inherited asset bundle/MediaQuery, which isn't
+    // reliably available in initState, so kick it off here — guarded so it
+    // only fires once per widget lifetime.
+    if (_precacheRequested) return;
+    _precacheRequested = true;
+    Future.wait([
+      precacheImage(
+          const AssetImage('assets/images/abi_and_andy_title.png'), context),
+      precacheImage(
+          const AssetImage('assets/images/champagne_home.png'), context),
+    ]).then((_) {
+      if (mounted) _entranceController.forward();
+    });
+  }
 
   @override
   void dispose() {
@@ -321,7 +343,7 @@ class _IntroductionState extends State<Introduction>
       color: backgroundColor,
       padding: EdgeInsets.fromLTRB(
         0,
-        (mobile ? 1 : 75) * spacingScale(context),
+        (mobile ? 1 : 35) * spacingScale(context),
         0,
         75 * spacingScale(context),
       ),
