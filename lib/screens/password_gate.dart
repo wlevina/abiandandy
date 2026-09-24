@@ -59,6 +59,15 @@ class _PasswordGateState extends State<PasswordGate>
     duration: const Duration(milliseconds: 500),
   );
 
+  // Fades the gate itself in on first appearance, so it settles in like the
+  // rest of the site instead of snapping into view.
+  late final AnimationController _entranceController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  );
+  late final Animation<double> _entranceOpacity =
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeIn);
+
   @override
   void initState() {
     super.initState();
@@ -76,7 +85,11 @@ class _PasswordGateState extends State<PasswordGate>
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     final unlocked = prefs.getBool(PasswordGate._prefsKey) ?? false;
-    if (unlocked) _transitionController.value = 1;
+    if (unlocked) {
+      _transitionController.value = 1;
+    } else {
+      _entranceController.forward();
+    }
     setState(() => _unlocked = unlocked);
   }
 
@@ -85,6 +98,7 @@ class _PasswordGateState extends State<PasswordGate>
     _controller.dispose();
     _shakeController.dispose();
     _transitionController.dispose();
+    _entranceController.dispose();
     super.dispose();
   }
 
@@ -300,7 +314,7 @@ class _PasswordGateState extends State<PasswordGate>
     }
 
     return AnimatedBuilder(
-      animation: _transitionController,
+      animation: Listenable.merge([_transitionController, _entranceController]),
       builder: (context, child) {
         final t = _transitionController.value;
 
@@ -309,7 +323,8 @@ class _PasswordGateState extends State<PasswordGate>
         // here, with no leftover Opacity/Stack wrapper around it.
         if (t >= _revealAt) return widget.child;
 
-        final gateOpacity = (1 - t / _gateFadeEnd).clamp(0.0, 1.0);
+        final exitOpacity = (1 - t / _gateFadeEnd).clamp(0.0, 1.0);
+        final gateOpacity = (exitOpacity * _entranceOpacity.value).clamp(0.0, 1.0);
 
         return Stack(
           fit: StackFit.expand,

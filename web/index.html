@@ -45,6 +45,115 @@
   <title>Abi & Andy</title>
   <link rel="manifest" href="manifest.json">
 
+  <!--
+      Matches the app's background colour (see backgroundColor across
+      lib/widgets and lib/screens/password_gate.dart) so the page never shows
+      a flash of white while main.dart.js is still downloading — see
+      #boot-splash below.
+    -->
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: #687351;
+    }
+  
+    #boot-splash {
+      position: fixed;
+      inset: 0;
+      background: #687351;
+      transition: opacity 400ms ease;
+      z-index: 9999;
+    }
+  
+    #boot-splash.boot-splash-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  
+    /* Eyeballed to roughly match where the squiggle sits on the real
+         password gate (lib/screens/password_gate.dart). 975px matches
+         mobileBreakpoint (lib/widgets/breakpoints.dart). */
+    #boot-splash .boot-splash-mark {
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+    }
+  
+    @media (max-width: 974px) {
+      #boot-splash .boot-splash-mark {
+        top: 37%;
+      }
+    }
+  
+    /* Echoes the squiggle divider used throughout the site (SquigglePainter).
+         It never animates directly — a cover slides over it via transform
+         instead, since animating the stroke itself (tried earlier) repaints
+         every frame and stutters against the main-thread work of loading
+         main.dart.js. */
+    #boot-splash .boot-splash-squiggle-wrap {
+      position: relative;
+      width: 90px;
+      height: 14px;
+      overflow: hidden;
+      animation: boot-splash-seam 1.3s ease-in-out infinite;
+    }
+  
+    /* Path mirrors SquigglePainter's curve formula
+         (lib/widgets/squiggle_painter.dart) at width 90 / height 14, so the
+         shape matches exactly. */
+    #boot-splash .boot-splash-squiggle {
+      position: absolute;
+      inset: 0;
+    }
+  
+    #boot-splash .boot-splash-squiggle path {
+      fill: none;
+      stroke: #F3F0E7;
+      stroke-width: 1.4;
+      stroke-linecap: round;
+    }
+  
+    /* Same colour as the splash background, so it reads as "not yet drawn"
+         rather than a visible box. Sliding it fully off to the right (its own
+         width, via translateX(100%)) reveals the squiggle underneath
+         progressively, left edge first. */
+    #boot-splash .boot-splash-cover {
+      position: absolute;
+      inset: 0;
+      background: #687351;
+      animation: boot-splash-wipe 1.3s ease-in-out infinite;
+    }
+  
+    @keyframes boot-splash-wipe {
+      0% {
+        transform: translateX(0%);
+      }
+  
+      100% {
+        transform: translateX(100%);
+      }
+    }
+  
+    /* Dips to 0 right at the loop boundary so the cover's hard reset back
+         to translateX(0%) happens while invisible instead of as a visible
+         snap. */
+    @keyframes boot-splash-seam {
+  
+      0%,
+      100% {
+        opacity: 0;
+      }
+  
+      8%,
+      92% {
+        opacity: 1;
+      }
+    }
+  </style>
+
   <script>
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
@@ -54,7 +163,35 @@
 </head>
 
 <body>
+  <div id="boot-splash">
+    <div class="boot-splash-mark">
+      <div class="boot-splash-squiggle-wrap">
+        <svg class="boot-splash-squiggle" viewBox="0 0 90 14" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,8.4 Q13.5,0 27,7 Q40.5,14 54,5.6 Q67.5,0 90,7" />
+        </svg>
+        <div class="boot-splash-cover"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
+      // Ensures at least one full draw cycle plays before hiding, so a
+      // fast/cached load doesn't cut it off mid-draw and look glitchy.
+      var bootSplashShownAt = Date.now();
+      var MIN_BOOT_SPLASH_MS = 1300;
+
+      // Flutter dispatches this on window once the first frame is actually
+      // painted, so the splash hands off cleanly instead of on a fixed timer.
+      window.addEventListener('flutter-first-frame', function () {
+        var splash = document.getElementById('boot-splash');
+        if (!splash) return;
+        var wait = Math.max(0, MIN_BOOT_SPLASH_MS - (Date.now() - bootSplashShownAt));
+        setTimeout(function () {
+          splash.classList.add('boot-splash-hidden');
+          setTimeout(function () { splash.remove(); }, 400);
+        }, wait);
+      });
+
     window.addEventListener('load', function (ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
